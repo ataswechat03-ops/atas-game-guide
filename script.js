@@ -34,10 +34,16 @@ const DRIVE_IMAGES={
     ['輪盤下注教學（中）','drive-image9.webp'],
     ['輪盤下注教學（下）','drive-image8.webp']
   ],
-  'color-dish':[
+  sedie:[
     ['色碟玩法圖解','drive-image13.webp'],
     ['色碟基本玩法','drive-image22.webp']
   ]
+};
+
+// 額外製作的教學主視覺：會優先作為首頁封面，點進教學後也會顯示。
+const CUSTOM_IMAGES={
+  sedie:[['色碟｜一看就懂','色碟玩法一看就懂.webp']],
+  fantan:[['番攤｜一看就懂','番攤一看就懂_開獎下注教學.png']]
 };
 
 let activeCategory='全部';
@@ -78,9 +84,11 @@ function renderCards(){
   $('#sectionTitle').textContent=activeCategory==='全部'?'全部教學':activeCategory;
   $('#empty').style.display=list.length?'none':'block';
   $('#guideGrid').innerHTML=list.map(g=>{
+    const custom=CUSTOM_IMAGES[g.id];
     const drive=DRIVE_IMAGES[g.id];
-    const cover=drive?.length
-      ? `<img src="${imageUrl(drive[0][1])}" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`
+    const primary=custom?.[0]||drive?.[0];
+    const cover=primary
+      ? `<img src="${imageUrl(primary[1])}" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`
       : g.id==='football'
         ? `<img src="${imageUrl(FOOTBALL_IMAGES[1][1])}" alt="足球基本知識">`
         : `<span class="emoji">${g.emoji}</span>`;
@@ -91,7 +99,8 @@ function renderCards(){
 function renderStats(){
   const sectionCount=GUIDES.reduce((n,g)=>n+g.sections.length,0);
   const driveCount=Object.values(DRIVE_IMAGES).reduce((n,arr)=>n+arr.length,0);
-  $('#heroStats').innerHTML=`<div class="stat"><b>${GUIDES.length}</b><span>教學主題</span></div><div class="stat"><b>${sectionCount}</b><span>教學章節</span></div><div class="stat"><b>${driveCount+7}</b><span>教學圖片</span></div><div class="stat"><b>3</b><span>主要分類</span></div>`;
+  const customCount=Object.values(CUSTOM_IMAGES).reduce((n,arr)=>n+arr.length,0);
+  $('#heroStats').innerHTML=`<div class="stat"><b>${GUIDES.length}</b><span>教學主題</span></div><div class="stat"><b>${sectionCount}</b><span>教學章節</span></div><div class="stat"><b>${driveCount+customCount+7}</b><span>教學圖片</span></div><div class="stat"><b>3</b><span>主要分類</span></div>`;
 }
 function renderAll(){renderNav();renderCards();renderStats();}
 function renderSection(s){
@@ -103,17 +112,17 @@ function renderSection(s){
   if(s.note){body+=`<div class="lesson-note">${esc(s.note)}</div>`;}
   return `<section class="lesson-section"><h3>${esc(s.title)}</h3>${body}</section>`;
 }
-function renderDriveGallery(id){
-  const imgs=DRIVE_IMAGES[id];
-  if(!imgs?.length)return '';
-  return `<section class="lesson-section"><h3>Google Drive 原教學圖片</h3><div class="football-grid">${imgs.map(([name,file])=>`<div class="football-img" data-img="${esc(file)}" data-name="${esc(name)}"><img src="${imageUrl(file)}" alt="${esc(name)}" onerror="this.closest('.football-img').style.display='none'"><b>${esc(name)}｜點擊看大圖</b></div>`).join('')}</div></section>`;
+function renderImageGallery(id){
+  const imgs=[...(CUSTOM_IMAGES[id]||[]),...(DRIVE_IMAGES[id]||[])];
+  if(!imgs.length)return '';
+  return `<section class="lesson-section"><h3>教學圖片</h3><div class="football-grid">${imgs.map(([name,file])=>`<div class="football-img" data-img="${esc(file)}" data-name="${esc(name)}"><img src="${imageUrl(file)}" alt="${esc(name)}" onerror="this.closest('.football-img').style.display='none'"><b>${esc(name)}｜點擊看大圖</b></div>`).join('')}</div></section>`;
 }
 function openGuide(id){
   const g=GUIDES.find(x=>x.id===id);if(!g)return;
   $('#detailCategory').textContent=g.category;
   $('#detailTitle').textContent=`${g.emoji} ${g.title}`;
   $('#detailIntro').textContent=g.intro;
-  $('#detailBody').innerHTML=g.sections.map(renderSection).join('')+renderDriveGallery(id)+`<div class="lesson-note warn">提醒：遊戲館別、桌型、特殊邊注、派彩與有效投注規則可能不同；實際操作與客服回覆時，仍以玩家當下遊戲畫面／桌面規則為準。</div>`;
+  $('#detailBody').innerHTML=g.sections.map(renderSection).join('')+renderImageGallery(id)+`<div class="lesson-note warn">提醒：遊戲館別、桌型、特殊邊注、派彩與有效投注規則可能不同；實際操作與客服回覆時，仍以玩家當下遊戲畫面／桌面規則為準。</div>`;
   $('#overlay').classList.add('show');$('#detail').classList.add('show');document.body.style.overflow='hidden';
   document.querySelectorAll('[data-img]').forEach(el=>el.onclick=()=>openZoom(el.dataset.img,el.dataset.name));
   location.hash=`guide=${encodeURIComponent(id)}`;
