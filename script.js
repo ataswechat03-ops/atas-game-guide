@@ -1,10 +1,12 @@
 const RAW='https://raw.githubusercontent.com/ataswechat03-ops/atas-game-guide/main/';
+const ZIP_FILE='ATAS_GoogleDrive_教學圖片_22張.zip';
+const ZIP_URLS={};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const imageUrl=f=>RAW+encodeURIComponent(f);
+const imageUrl=f=>ZIP_URLS[f]||RAW+encodeURIComponent(f);
 
 // 從 Google Drive《遊戲教學》內嵌圖片整理出的網站圖片。
-// 圖片檔上傳到 repository 根目錄後，網站會自動顯示。
+// 目前直接讀取 repository 裡已上傳的 ZIP，不需要手動解壓。
 const DRIVE_IMAGES={
   slots:[
     ['賠付線圖解','drive-image4.webp'],
@@ -40,6 +42,24 @@ const DRIVE_IMAGES={
 
 let activeCategory='全部';
 let query='';
+
+async function loadDriveImagesFromZip(){
+  if(typeof JSZip==='undefined')return;
+  try{
+    const res=await fetch(encodeURI(ZIP_FILE),{cache:'no-store'});
+    if(!res.ok)throw new Error(`ZIP HTTP ${res.status}`);
+    const zip=await JSZip.loadAsync(await res.arrayBuffer());
+    const files=[...new Set(Object.values(DRIVE_IMAGES).flat().map(x=>x[1]))];
+    await Promise.all(files.map(async file=>{
+      const entry=zip.file(file);
+      if(!entry)return;
+      const blob=await entry.async('blob');
+      ZIP_URLS[file]=URL.createObjectURL(blob);
+    }));
+  }catch(err){
+    console.warn('Google Drive 教學圖片 ZIP 載入失敗：',err);
+  }
+}
 
 function categories(){return ['全部','電子遊戲','真人遊戲','體育'];}
 function visibleGuides(){
@@ -112,5 +132,13 @@ $('#q').oninput=e=>{query=e.target.value;renderCards();};
 $('#closeDetail').onclick=closeDetail;
 $('#overlay').onclick=()=>{$('#sidebar').classList.contains('open')?closeSidebar():closeDetail();};
 $('#menuBtn').onclick=openSidebar;$('#mobileClose').onclick=closeSidebar;
-renderAll();
-if(location.hash.startsWith('#guide=')){const id=decodeURIComponent(location.hash.slice(7));setTimeout(()=>openGuide(id),0);}
+
+async function boot(){
+  await loadDriveImagesFromZip();
+  renderAll();
+  if(location.hash.startsWith('#guide=')){
+    const id=decodeURIComponent(location.hash.slice(7));
+    setTimeout(()=>openGuide(id),0);
+  }
+}
+boot();
