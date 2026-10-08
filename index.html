@@ -4,56 +4,59 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#08111f">
-<title>ATAS 遊戲教學中心｜足球基本知識</title>
-<style>
-:root{--bg:#07101d;--panel:#0d1828;--panel2:#122136;--line:#22344c;--text:#f4f8ff;--muted:#91a1b7;--blue:#1687ff;--green:#20b15a;--gold:#ffd76a}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;background:radial-gradient(circle at 85% 0,#0e2a49 0,transparent 28%),var(--bg);color:var(--text)}button,input{font:inherit}.app{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:100vh}aside{position:sticky;top:0;height:100vh;padding:24px 18px;background:#08111fee;border-right:1px solid var(--line)}.brand{display:flex;align-items:center;gap:12px;margin-bottom:30px}.logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#1687ff,#0c4da6);font-size:22px;font-weight:900;box-shadow:0 10px 30px #1687ff33}.brand b{display:block}.brand small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.side-title{font-size:10px;letter-spacing:.15em;font-weight:900;color:#63748d;margin:22px 9px 8px}.filter{width:100%;border:0;border-radius:10px;padding:11px 12px;text-align:left;background:#122136;color:#fff;box-shadow:inset 3px 0 var(--blue);font-weight:750}.filter.sub{margin-top:7px;background:transparent;color:#b8c5d5;box-shadow:none}.filter.sub.active{background:#122136;box-shadow:inset 3px 0 var(--green)}main{padding:28px clamp(18px,4vw,58px) 70px;min-width:0}.subhead{font-size:10px;color:#72839a;letter-spacing:.18em;font-weight:900}header{margin-bottom:20px}header h1{font-size:24px;margin:4px 0 0}.hero{border:1px solid var(--line);border-radius:22px;padding:34px;background:radial-gradient(circle at 85% 25%,#1687ff28,transparent 25%),linear-gradient(135deg,#13243a,#0b1625);margin-bottom:20px;overflow:hidden;position:relative}.hero:after{content:"FOOTBALL";position:absolute;right:22px;bottom:-30px;font-size:90px;font-weight:900;letter-spacing:-.06em;color:#ffffff08}.pill{display:inline-flex;color:var(--gold);border:1px solid #ffd76a40;background:#ffd76a0c;border-radius:99px;padding:6px 10px;font-size:10px;font-weight:800}.hero h2{font-size:clamp(30px,4vw,48px);margin:14px 0 10px}.hero p{color:#aab8ca;line-height:1.8;max-width:720px;margin:0}.search{display:flex;gap:10px;margin:18px 0 24px}.search input{flex:1;background:#0d1828;border:1px solid var(--line);border-radius:12px;color:#fff;padding:13px 14px;outline:none}.count{color:#8392a8;font-size:12px;display:flex;align-items:center}.section-title{margin-bottom:14px}.section-title h2{font-size:22px;margin:0}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.card{border:1px solid var(--line);background:linear-gradient(180deg,#102039,#0c1727);border-radius:18px;overflow:hidden;transition:.2s;min-width:0}.card:hover{transform:translateY(-4px);border-color:#365579;box-shadow:0 18px 45px #0006}.thumb{height:300px;background:#f7fbff;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}.thumb img{width:100%;height:100%;object-fit:contain;object-position:center;display:block;background:#fff}.fallback{position:absolute;inset:0;display:grid;place-items:center;color:#74859b;font-size:12px;background:linear-gradient(135deg,#13243a,#0b1625)}.badge{position:absolute;left:11px;top:11px;background:#07101dcc;border:1px solid #ffffff20;border-radius:999px;padding:5px 9px;font-size:9px;font-weight:850;z-index:3}.body{padding:15px}.meta{font-size:9px;color:#74849a;margin-bottom:7px}.body h3{font-size:17px;margin:0 0 8px}.body p{font-size:11px;color:#9cabbc;line-height:1.7;min-height:38px;margin:0}.open{width:100%;border:0;border-top:1px solid var(--line);background:transparent;color:#75baff;padding:12px;font-weight:850}.empty{display:none;padding:60px 20px;text-align:center;color:#8190a4}.overlay{position:fixed;inset:0;background:#000b;backdrop-filter:blur(5px);z-index:30;display:none}.overlay.show{display:block}.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.97);width:min(900px,calc(100% - 24px));max-height:92vh;overflow:auto;background:#0b1625;border:1px solid var(--line);border-radius:20px;z-index:40;opacity:0;pointer-events:none;transition:.2s;box-shadow:0 30px 90px #000b}.modal.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}.modal-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;padding:20px;border-bottom:1px solid var(--line)}.modal-head h2{margin:3px 0 0;font-size:25px}.close{width:38px;height:38px;border:1px solid var(--line);border-radius:10px;background:#142238;color:#fff;font-size:21px;cursor:pointer}.modal-content{padding:20px}.modal-content img{width:100%;display:block;border-radius:14px;border:1px solid var(--line);background:#fff}.image-missing{padding:70px 20px;text-align:center;border:1px dashed #36506f;border-radius:14px;color:#8292a8}.note{margin-top:15px;padding:13px 14px;border-radius:12px;background:#122136;border:1px solid var(--line);color:#aab8ca;font-size:12px;line-height:1.7}@media(max-width:1050px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));}}@media(max-width:720px){.app{display:block}aside{display:none}main{padding:18px 15px 50px}.hero{padding:24px}.hero:after{font-size:62px}.grid{grid-template-columns:1fr}.thumb{height:360px}.search{display:grid}.count{justify-content:flex-end}.modal-head h2{font-size:21px}}
-</style>
+<title>ATAS 遊戲教學中心</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="app">
-<aside>
-  <div class="brand"><div class="logo">A</div><div><b>ATAS</b><small>遊戲教學中心</small></div></div>
-  <div class="side-title">分類</div>
-  <button class="filter">足球基本知識</button>
-  <button class="filter sub active">全部足球教學</button>
-  <div class="side-title">目前內容</div>
-  <button class="filter sub" data-jump="印尼盤">印尼盤</button>
-  <button class="filter sub" data-jump="歐洲盤">歐洲盤</button>
-  <button class="filter sub" data-jump="美國盤">美國盤</button>
-  <button class="filter sub" data-jump="香港盤">香港盤</button>
-  <button class="filter sub" data-jump="馬來盤">馬來盤</button>
-  <button class="filter sub" data-jump="足球讓分">足球讓分</button>
-  <button class="filter sub" data-jump="足球大小盤">足球大小盤</button>
-</aside>
-<main>
-  <header><div class="subhead">ATAS KNOWLEDGE BASE</div><h1>遊戲教學中心</h1></header>
-  <section class="hero"><span class="pill">足球教學・新手入門</span><h2>足球基本知識</h2><p>把常見足球盤口與賠率顯示方式整理成一看就懂的圖解。需要哪一種盤口，直接搜尋或點開查看完整教學圖。</p></section>
-  <section class="search"><input id="q" placeholder="搜尋：印尼盤、歐洲盤、讓分、大小盤…"><div class="count" id="count">共 7 篇</div></section>
-  <div class="section-title"><div class="subhead">FOOTBALL BASICS</div><h2>足球基本知識</h2></div>
-  <section class="grid" id="grid"></section>
-  <div class="empty" id="empty">找不到符合的足球教學。</div>
-</main>
+  <aside id="sidebar">
+    <div class="brand">
+      <div class="logo">A</div>
+      <div><b>ATAS</b><small>遊戲教學中心</small></div>
+    </div>
+    <button class="mobile-close" id="mobileClose">×</button>
+    <div class="side-title">分類</div>
+    <nav id="categoryNav"></nav>
+    <div class="side-title">快速進入</div>
+    <nav id="guideNav"></nav>
+  </aside>
+
+  <main>
+    <header>
+      <div class="header-left">
+        <button class="menu-btn" id="menuBtn">☰</button>
+        <div><div class="subhead">ATAS KNOWLEDGE BASE</div><h1>遊戲教學中心</h1></div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <span class="pill">Google Drive 教學已整合</span>
+      <h2>一個網址，把教學全部集中。</h2>
+      <p>電子、真人、體育基礎教學都整理在這裡。搜尋關鍵字或選擇分類，點進去就能查看完整內容。</p>
+      <div class="hero-stats" id="heroStats"></div>
+    </section>
+
+    <section class="toolbar">
+      <label class="search"><span>⌕</span><input id="q" placeholder="搜尋：百家樂、骰寶、LINE、WAYS、足球、輪盤…"></label>
+      <div class="count" id="count"></div>
+    </section>
+
+    <div class="section-title"><div class="subhead">TUTORIAL LIBRARY</div><h2 id="sectionTitle">全部教學</h2></div>
+    <section class="guide-grid" id="guideGrid"></section>
+    <div class="empty" id="empty">找不到符合的教學。</div>
+  </main>
 </div>
+
 <div class="overlay" id="overlay"></div>
-<section class="modal" id="modal">
-  <div class="modal-head"><div><div class="subhead">FOOTBALL GUIDE</div><h2 id="modalTitle"></h2></div><button class="close" id="close">×</button></div>
-  <div class="modal-content" id="modalContent"></div>
+<section class="detail" id="detail">
+  <div class="detail-head">
+    <div><div class="subhead" id="detailCategory"></div><h2 id="detailTitle"></h2><p id="detailIntro"></p></div>
+    <button class="close" id="closeDetail">×</button>
+  </div>
+  <div class="detail-body" id="detailBody"></div>
 </section>
-<script>
-const RAW='https://raw.githubusercontent.com/ataswechat03-ops/atas-game-guide/main/';
-const guides=[
- {title:'印尼盤',file:'印尼盤快速計算足球資訊圖.png',desc:'看懂正負數，快速計算淨利與總返還。',keys:'印尼盤 正數 負數 賠率 淨利 總返還'},
- {title:'歐洲盤',file:'歐洲盤賠率入門資訊圖表.png',desc:'最直觀的賠率顯示方式，直接用本金乘賠率。',keys:'歐洲盤 小數盤 賠率 總返還 淨利'},
- {title:'美國盤',file:'美國盤投注教學資訊圖表.png',desc:'認識美國盤正負數，以及以 100 為基準的計算方式。',keys:'美國盤 American odds 正數 負數'},
- {title:'香港盤',file:'香港盤賠率計算入門圖解.png',desc:'香港盤顯示淨利倍率，不包含本金，計算方式簡單直觀。',keys:'香港盤 賠率 淨利 本金'},
- {title:'馬來盤',file:'馬來盤新手速懂足球賠率圖解.png',desc:'快速掌握馬來盤正負數與常見賠率換算概念。',keys:'馬來盤 馬來西亞盤 正數 負數 賠率'},
- {title:'足球讓分',file:'足球讓分一看就懂攻略.png',desc:'理解讓分、吃分，以及 0.25、0.5、0.75、1.0 常見盤口。',keys:'足球 讓分 吃分 亞洲盤 0.25 0.5 0.75'},
- {title:'足球大小盤',file:'足球大小盤一看就懂.png',desc:'看一場比賽的總進球數，快速判斷大球與小球。',keys:'足球 大小盤 大球 小球 總進球數'}
-];
-const $=s=>document.querySelector(s);const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const imageUrl=f=>RAW+encodeURIComponent(f);
-function render(){const q=$('#q').value.trim().toLowerCase();const list=guides.filter(g=>!q||(`${g.title} ${g.desc} ${g.keys}`).toLowerCase().includes(q));$('#count').textContent=`共 ${list.length} 篇`;$('#empty').style.display=list.length?'none':'block';$('#grid').innerHTML=list.map(g=>`<article class="card" data-title="${esc(g.title)}"><div class="thumb"><div class="fallback">圖片載入中…</div><img src="${imageUrl(g.file)}" alt="${esc(g.title)}教學圖" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none';this.previousElementSibling.textContent='圖片載入失敗'"><span class="badge">足球基本知識</span></div><div class="body"><div class="meta">足球 ・ 新手教學</div><h3>${esc(g.title)}</h3><p>${esc(g.desc)}</p></div><button class="open">查看完整教學 →</button></article>`).join('');document.querySelectorAll('.card').forEach(c=>c.onclick=()=>openGuide(c.dataset.title));}
-function openGuide(title){const g=guides.find(x=>x.title===title);if(!g)return;$('#modalTitle').textContent=g.title;$('#modalContent').innerHTML=`<div style="position:relative"><div class="image-missing">圖片載入中…</div><img src="${imageUrl(g.file)}" alt="${esc(g.title)}教學圖" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none';this.previousElementSibling.textContent='圖片載入失敗'"></div><div class="note">${esc(g.desc)}</div>`;$('#overlay').classList.add('show');$('#modal').classList.add('show');}
-function closeModal(){$('#overlay').classList.remove('show');$('#modal').classList.remove('show');}
-$('#q').oninput=render;$('#close').onclick=closeModal;$('#overlay').onclick=closeModal;document.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>{$('#q').value=b.dataset.jump;render();window.scrollTo({top:420,behavior:'smooth'});});render();
-</script>
-</body></html>
+
+<script src="guides.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
