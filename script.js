@@ -2,6 +2,42 @@ const RAW='https://raw.githubusercontent.com/ataswechat03-ops/atas-game-guide/ma
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const imageUrl=f=>RAW+encodeURIComponent(f);
+
+// 從 Google Drive《遊戲教學》內嵌圖片整理出的網站圖片。
+// 圖片檔上傳到 repository 根目錄後，網站會自動顯示。
+const DRIVE_IMAGES={
+  slots:[
+    ['賠付線圖解','drive-image4.webp'],
+    ['WILD 倍率畫面','drive-image3.webp'],
+    ['Q 圖案倍率','drive-image5.webp'],
+    ['K 圖案倍率','drive-image1.webp'],
+    ['J 圖案倍率','drive-image18.webp'],
+    ['WIN 結算範例','drive-image6.webp'],
+    ['圖案倍率範例','drive-image2.webp'],
+    ['Cluster 遊戲畫面','drive-image20.webp'],
+    ['特殊圖案倍率','drive-image19.webp'],
+    ['Cluster 遊戲畫面 2','drive-image21.webp']
+  ],
+  baccarat:[
+    ['百家樂基本玩法','drive-image12.webp'],
+    ['補牌與龍寶','drive-image17.webp'],
+    ['百家樂下注圖解','drive-image10.webp'],
+    ['免傭模式與幸運 6','drive-image15.webp'],
+    ['百家樂玩法圖解','drive-image11.webp'],
+    ['百家樂牌規','drive-image16.webp']
+  ],
+  sicbo:[['骰寶玩法圖解','drive-image14.webp']],
+  roulette:[
+    ['輪盤下注教學（上）','drive-image7.webp'],
+    ['輪盤下注教學（中）','drive-image9.webp'],
+    ['輪盤下注教學（下）','drive-image8.webp']
+  ],
+  'color-dish':[
+    ['色碟玩法圖解','drive-image13.webp'],
+    ['色碟基本玩法','drive-image22.webp']
+  ]
+};
+
 let activeCategory='全部';
 let query='';
 
@@ -22,14 +58,20 @@ function renderCards(){
   $('#sectionTitle').textContent=activeCategory==='全部'?'全部教學':activeCategory;
   $('#empty').style.display=list.length?'none':'block';
   $('#guideGrid').innerHTML=list.map(g=>{
-    const cover=g.id==='football'?`<img src="${imageUrl(FOOTBALL_IMAGES[1][1])}" alt="足球基本知識">`:`<span class="emoji">${g.emoji}</span>`;
+    const drive=DRIVE_IMAGES[g.id];
+    const cover=drive?.length
+      ? `<img src="${imageUrl(drive[0][1])}" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`
+      : g.id==='football'
+        ? `<img src="${imageUrl(FOOTBALL_IMAGES[1][1])}" alt="足球基本知識">`
+        : `<span class="emoji">${g.emoji}</span>`;
     return `<article class="guide-card" data-open="${g.id}"><div class="cover">${cover}<span class="badge">${esc(g.category)}</span></div><div class="card-body"><div class="card-meta">${g.tags.slice(0,4).map(esc).join(' ・ ')}</div><h3>${esc(g.title)}</h3><p>${esc(g.intro)}</p></div><div class="card-footer"><span>${g.sections.length} 個章節</span><b>查看完整教學 →</b></div></article>`;
   }).join('');
   document.querySelectorAll('[data-open]').forEach(c=>c.onclick=()=>openGuide(c.dataset.open));
 }
 function renderStats(){
   const sectionCount=GUIDES.reduce((n,g)=>n+g.sections.length,0);
-  $('#heroStats').innerHTML=`<div class="stat"><b>${GUIDES.length}</b><span>教學主題</span></div><div class="stat"><b>${sectionCount}</b><span>教學章節</span></div><div class="stat"><b>3</b><span>主要分類</span></div><div class="stat"><b>7</b><span>足球圖解</span></div>`;
+  const driveCount=Object.values(DRIVE_IMAGES).reduce((n,arr)=>n+arr.length,0);
+  $('#heroStats').innerHTML=`<div class="stat"><b>${GUIDES.length}</b><span>教學主題</span></div><div class="stat"><b>${sectionCount}</b><span>教學章節</span></div><div class="stat"><b>${driveCount+7}</b><span>教學圖片</span></div><div class="stat"><b>3</b><span>主要分類</span></div>`;
 }
 function renderAll(){renderNav();renderCards();renderStats();}
 function renderSection(s){
@@ -41,12 +83,17 @@ function renderSection(s){
   if(s.note){body+=`<div class="lesson-note">${esc(s.note)}</div>`;}
   return `<section class="lesson-section"><h3>${esc(s.title)}</h3>${body}</section>`;
 }
+function renderDriveGallery(id){
+  const imgs=DRIVE_IMAGES[id];
+  if(!imgs?.length)return '';
+  return `<section class="lesson-section"><h3>Google Drive 原教學圖片</h3><div class="football-grid">${imgs.map(([name,file])=>`<div class="football-img" data-img="${esc(file)}" data-name="${esc(name)}"><img src="${imageUrl(file)}" alt="${esc(name)}" onerror="this.closest('.football-img').style.display='none'"><b>${esc(name)}｜點擊看大圖</b></div>`).join('')}</div></section>`;
+}
 function openGuide(id){
   const g=GUIDES.find(x=>x.id===id);if(!g)return;
   $('#detailCategory').textContent=g.category;
   $('#detailTitle').textContent=`${g.emoji} ${g.title}`;
   $('#detailIntro').textContent=g.intro;
-  $('#detailBody').innerHTML=g.sections.map(renderSection).join('')+`<div class="lesson-note warn">提醒：遊戲館別、桌型、特殊邊注、派彩與有效投注規則可能不同；實際操作與客服回覆時，仍以玩家當下遊戲畫面／桌面規則為準。</div>`;
+  $('#detailBody').innerHTML=g.sections.map(renderSection).join('')+renderDriveGallery(id)+`<div class="lesson-note warn">提醒：遊戲館別、桌型、特殊邊注、派彩與有效投注規則可能不同；實際操作與客服回覆時，仍以玩家當下遊戲畫面／桌面規則為準。</div>`;
   $('#overlay').classList.add('show');$('#detail').classList.add('show');document.body.style.overflow='hidden';
   document.querySelectorAll('[data-img]').forEach(el=>el.onclick=()=>openZoom(el.dataset.img,el.dataset.name));
   location.hash=`guide=${encodeURIComponent(id)}`;
