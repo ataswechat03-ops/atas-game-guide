@@ -1,49 +1,63 @@
 (()=>{
   'use strict';
 
-  const SPRITE_PARTS=[
-    'images/covers/cinematic-parts/part00.txt',
-    'images/covers/cinematic-parts/part01.txt',
-    'images/covers/cinematic-parts/part02.txt',
-    'images/covers/cinematic-parts/part04.txt',
-    'images/covers/cinematic-parts/part05.txt',
-    'images/covers/cinematic-parts/part06_07.txt',
-    'images/covers/cinematic-parts/part08.txt',
-    'images/covers/cinematic-parts/part09.txt'
+  const ORDER=[
+    'slots','baccarat','sicbo','roulette',
+    'sedie','fantan','football','football-europe',
+    'football-hongkong','football-malay','football-indo','football-american'
   ];
 
-  const SPRITE_POS={
-    slots:[0,5.5],
-    baccarat:[33.333,5.5],
-    sicbo:[66.667,5.5],
-    roulette:[100,5.5],
-    sedie:[0,50],
-    fantan:[33.333,50],
-    football:[66.667,50],
-    'football-europe':[100,50],
-    'football-hongkong':[0,94.5],
-    'football-malay':[33.333,94.5],
-    'football-indo':[66.667,94.5],
-    'football-american':[100,94.5]
-  };
+  const SPRITE_PARTS=[
+    'part00.txt','part01.txt','part02.txt','part03.txt','part04.txt','part05.txt',
+    'part06_07.txt','part08.txt','part09.txt','part10.txt','part11.txt','part12.txt'
+  ];
 
   let spriteUrl='';
 
   const style=document.createElement('style');
   style.textContent=`
-    .guide-card .cover{height:auto!important;aspect-ratio:3/1;overflow:hidden;background:#0c1a2c}
-    .cinematic-sprite{width:100%;height:100%;background-repeat:no-repeat;background-size:400% auto;background-color:#0c1a2c}
-    .cover-loading{width:100%;height:100%;background:linear-gradient(110deg,#101d30 25%,#1b2d46 40%,#101d30 55%);background-size:220% 100%;animation:coverShimmer 1.2s linear infinite}
+    .guide-card .cover{
+      height:auto!important;
+      aspect-ratio:2.265/1;
+      overflow:hidden;
+      background:#0c1a2c;
+      position:relative
+    }
+    .guide-card .cover-art{
+      position:absolute;
+      inset:0;
+      background-repeat:no-repeat;
+      background-size:400% 300%;
+      background-color:#0c1a2c
+    }
+    .guide-card .cover .emoji{
+      width:100%;height:100%;display:grid;place-items:center;font-size:58px;
+      background:linear-gradient(135deg,#142943,#0c1727)
+    }
+    .guide-card .cover .badge{position:absolute;z-index:2}
+    .cover-loading{
+      position:absolute;inset:0;
+      background:linear-gradient(110deg,#101d30 25%,#1b2d46 40%,#101d30 55%);
+      background-size:220% 100%;animation:coverShimmer 1.2s linear infinite
+    }
     @keyframes coverShimmer{to{background-position-x:-220%}}
   `;
   document.head.appendChild(style);
 
+  function pos(id){
+    const i=ORDER.indexOf(id);
+    if(i<0)return null;
+    const col=i%4;
+    const row=Math.floor(i/4);
+    return `${col*100/3}% ${row*50}%`;
+  }
+
   function coverHtml(g){
-    const pos=SPRITE_POS[g.id];
-    if(pos&&spriteUrl){
-      return `<div class="cinematic-sprite" role="img" aria-label="${esc(g.title)}" style="background-image:url('${spriteUrl}');background-position:${pos[0]}% ${pos[1]}%"></div>`;
+    const p=pos(g.id);
+    if(spriteUrl&&p){
+      return `<div class="cover-art" style="background-image:url('${spriteUrl}');background-position:${p}" role="img" aria-label="${esc(g.title)}"></div>`;
     }
-    if(pos)return '<div class="cover-loading"></div>';
+    if(p)return '<div class="cover-loading"></div>';
     return `<span class="emoji">${g.emoji}</span>`;
   }
 
@@ -58,9 +72,10 @@
 
   async function loadSprite(){
     try{
-      const parts=await Promise.all(SPRITE_PARTS.map(async path=>{
-        const r=await fetch(path+'?v=cinematic2',{cache:'force-cache'});
-        if(!r.ok)throw new Error(`${path}: HTTP ${r.status}`);
+      const base='images/covers/cinematic-parts/';
+      const parts=await Promise.all(SPRITE_PARTS.map(async file=>{
+        const r=await fetch(`${base}${file}?v=cinematic3`,{cache:'no-store'});
+        if(!r.ok)throw new Error(`${file}: ${r.status}`);
         return (await r.text()).trim();
       }));
       const b64=parts.join('').replace(/\s+/g,'');
@@ -70,7 +85,8 @@
       spriteUrl=URL.createObjectURL(new Blob([bytes],{type:'image/webp'}));
       renderCards();
     }catch(err){
-      console.error('電影感封面載入失敗',err);
+      console.warn('Cinematic covers failed to load:',err);
+      renderCards();
     }
   }
 
