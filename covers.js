@@ -1,8 +1,8 @@
 (()=>{
   'use strict';
 
-  // 首頁卡片專用封面：全部使用同一張輕量 Sprite，避免載入 12 張大圖。
-  const SPRITE='images/covers/tutorial-covers.webp';
+  // 首頁卡片專用封面：使用 4×3 Sprite；每格皆為 3:1，避免拉伸變形。
+  const SPRITE='images/covers/tutorial-covers.webp?v=4';
   const POS={
     slots:[0,0],
     baccarat:[1,0],
@@ -22,8 +22,8 @@
 
   const style=document.createElement('style');
   style.textContent=`
+    .guide-card .cover{height:auto!important;aspect-ratio:3/1;overflow:hidden}
     .cover-sprite{display:block;width:100%;height:100%;background-image:url('${SPRITE}');background-repeat:no-repeat;background-size:400% 300%;background-color:#0c1a2c}
-    .guide-card .cover{overflow:hidden}
   `;
   document.head.appendChild(style);
 
