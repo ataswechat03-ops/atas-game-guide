@@ -84,14 +84,13 @@
   const existing=new Set(GUIDES.map(g=>g.id));
   oddsGuides.forEach(g=>{if(!existing.has(g.id))GUIDES.push(g);});
 
-  // 為五個獨立教學設定首頁封面。
   CUSTOM_IMAGES['football-europe']=[['歐洲盤','歐洲盤賠率入門資訊圖表.png']];
   CUSTOM_IMAGES['football-hongkong']=[['香港盤','香港盤賠率計算入門圖解.png']];
   CUSTOM_IMAGES['football-malay']=[['馬來盤','馬來盤新手速懂足球賠率圖解.png']];
   CUSTOM_IMAGES['football-indo']=[['印尼盤','印尼盤快速計算足球資訊圖.png']];
   CUSTOM_IMAGES['football-american']=[['美國盤','美國盤投注教學資訊圖表.png']];
 
-  // 把原本混合式計算器改成三個完全獨立的計算器。
+  // 五種盤口全部獨立計算，介面與公式不混用。
   const oldSelect=document.querySelector('#oddsType');
   const panel=oldSelect?.closest('.training-panel');
   if(panel){
@@ -102,9 +101,21 @@
     document.head.appendChild(style);
     panel.innerHTML=`
       <span class="tool-tag">快速工具</span>
-      <h3>三種盤口｜獨立計算</h3>
-      <p class="hint">馬來盤、印尼盤、美國盤完全分開輸入與計算，避免新人混淆。</p>
+      <h3>五種盤口｜獨立計算</h3>
+      <p class="hint">歐洲盤、香港盤、馬來盤、印尼盤、美國盤全部分開輸入與計算，避免新人混淆。</p>
       <div class="odds-v2-list">
+        <div class="odds-v2">
+          <h4>歐洲盤計算器</h4>
+          <div class="calc-row"><div class="calc-field"><label>下注本金（TWD）</label><input id="euStake" type="number" step="any" value="1000"></div><div class="calc-field"><label>歐洲盤賠率</label><input id="euOdds" type="number" step="any" value="1.90"></div></div>
+          <div class="odds-v2-result"><div><span>淨利</span><b id="euProfit">—</b></div><div><span>總返還</span><b id="euTotal">—</b></div></div>
+          <p class="mini">公式：總返還＝本金 × 賠率；淨利＝總返還－本金。</p>
+        </div>
+        <div class="odds-v2">
+          <h4>香港盤計算器</h4>
+          <div class="calc-row"><div class="calc-field"><label>下注本金（TWD）</label><input id="hkStake" type="number" step="any" value="1000"></div><div class="calc-field"><label>香港盤賠率</label><input id="hkOdds" type="number" step="any" value="0.90"></div></div>
+          <div class="odds-v2-result"><div><span>淨利</span><b id="hkProfit">—</b></div><div><span>總返還</span><b id="hkTotal">—</b></div></div>
+          <p class="mini">公式：淨利＝本金 × 賠率；總返還＝本金＋淨利。</p>
+        </div>
         <div class="odds-v2">
           <h4>馬來盤計算器</h4>
           <div class="calc-field odds-mode"><label>計算模式</label><select id="mlMode"><option value="stake">我有多少下注本金</option><option value="target">我想淨贏多少</option></select></div>
@@ -128,6 +139,21 @@
 
     const fmt=n=>Number.isFinite(n)?`TWD ${Number(n).toLocaleString('zh-TW',{maximumFractionDigits:2})}`:'—';
     const val=id=>Number(document.querySelector(id)?.value);
+
+    function calcEurope(){
+      const stake=val('#euStake'),odds=val('#euOdds');
+      if(!(stake>0)||!(odds>=1)){document.querySelector('#euProfit').textContent='—';document.querySelector('#euTotal').textContent='—';return;}
+      const total=stake*odds,profit=total-stake;
+      document.querySelector('#euProfit').textContent=fmt(profit);
+      document.querySelector('#euTotal').textContent=fmt(total);
+    }
+    function calcHK(){
+      const stake=val('#hkStake'),odds=val('#hkOdds');
+      if(!(stake>0)||!(odds>=0)){document.querySelector('#hkProfit').textContent='—';document.querySelector('#hkTotal').textContent='—';return;}
+      const profit=stake*odds,total=stake+profit;
+      document.querySelector('#hkProfit').textContent=fmt(profit);
+      document.querySelector('#hkTotal').textContent=fmt(total);
+    }
     function calcMalay(){
       const mode=document.querySelector('#mlMode').value,amount=val('#mlAmount'),odds=val('#mlOdds');
       const a=Math.abs(odds);
@@ -160,11 +186,14 @@
       const profit=odds>0?stake*odds/100:stake*100/a;
       document.querySelector('#usProfit').textContent=fmt(profit);document.querySelector('#usTotal').textContent=fmt(stake+profit);
     }
+
+    ['#euStake','#euOdds'].forEach(s=>document.querySelector(s).addEventListener('input',calcEurope));
+    ['#hkStake','#hkOdds'].forEach(s=>document.querySelector(s).addEventListener('input',calcHK));
     ['#mlAmount','#mlOdds'].forEach(s=>document.querySelector(s).addEventListener('input',calcMalay));
     document.querySelector('#mlMode').addEventListener('change',()=>{document.querySelector('#mlAmount').value=document.querySelector('#mlMode').value==='target'?100:94.4;calcMalay();});
     ['#idStake','#idOdds'].forEach(s=>document.querySelector(s).addEventListener('input',calcIndo));
     ['#usStake','#usOdds'].forEach(s=>document.querySelector(s).addEventListener('input',calcUS));
-    calcMalay();calcIndo();calcUS();
+    calcEurope();calcHK();calcMalay();calcIndo();calcUS();
   }
 
   if(typeof renderAll==='function')renderAll();
