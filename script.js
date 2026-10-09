@@ -6,7 +6,6 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&
 const imageUrl=f=>ZIP_URLS[f]||RAW+encodeURIComponent(f);
 
 // 從 Google Drive《遊戲教學》內嵌圖片整理出的網站圖片。
-// 目前直接讀取 repository 裡已上傳的 ZIP，不需要手動解壓。
 const DRIVE_IMAGES={
   slots:[
     ['賠付線圖解','drive-image4.webp'],
@@ -40,7 +39,6 @@ const DRIVE_IMAGES={
   ]
 };
 
-// 額外製作的教學主視覺：會優先作為首頁封面，點進教學後也會顯示。
 const CUSTOM_IMAGES={
   sedie:[['色碟｜一看就懂','色碟玩法一看就懂.webp']],
   fantan:[['番攤｜一看就懂','番攤一看就懂_開獎下注教學.png']]
@@ -48,23 +46,34 @@ const CUSTOM_IMAGES={
 
 let activeCategory='全部';
 let query='';
+let driveZipLoaded=false;
+let driveZipPromise=null;
 
 async function loadDriveImagesFromZip(){
-  if(typeof JSZip==='undefined')return;
-  try{
-    const res=await fetch(encodeURI(ZIP_FILE),{cache:'no-store'});
-    if(!res.ok)throw new Error(`ZIP HTTP ${res.status}`);
-    const zip=await JSZip.loadAsync(await res.arrayBuffer());
-    const files=[...new Set(Object.values(DRIVE_IMAGES).flat().map(x=>x[1]))];
-    await Promise.all(files.map(async file=>{
-      const entry=zip.file(file);
-      if(!entry)return;
-      const blob=await entry.async('blob');
-      ZIP_URLS[file]=URL.createObjectURL(blob);
-    }));
-  }catch(err){
-    console.warn('Google Drive 教學圖片 ZIP 載入失敗：',err);
-  }
+  if(driveZipLoaded)return true;
+  if(driveZipPromise)return driveZipPromise;
+  if(typeof JSZip==='undefined')return false;
+  driveZipPromise=(async()=>{
+    try{
+      const res=await fetch(encodeURI(ZIP_FILE),{cache:'force-cache'});
+      if(!res.ok)throw new Error(`ZIP HTTP ${res.status}`);
+      const zip=await JSZip.loadAsync(await res.arrayBuffer());
+      const files=[...new Set(Object.values(DRIVE_IMAGES).flat().map(x=>x[1]))];
+      await Promise.all(files.map(async file=>{
+        const entry=zip.file(file);if(!entry)return;
+        const blob=await entry.async('blob');
+        ZIP_URLS[file]=URL.createObjectURL(blob);
+      }));
+      driveZipLoaded=true;
+      return true;
+    }catch(err){
+      console.warn('Google Drive 教學圖片 ZIP 載入失敗：',err);
+      return false;
+    }finally{
+      driveZipPromise=null;
+    }
+  })();
+  return driveZipPromise;
 }
 
 function categories(){return ['全部','電子遊戲','真人遊戲','體育'];}
@@ -86,11 +95,13 @@ function renderCards(){
   $('#guideGrid').innerHTML=list.map(g=>{
     const custom=CUSTOM_IMAGES[g.id];
     const drive=DRIVE_IMAGES[g.id];
-    const primary=custom?.[0]||drive?.[0];
+    const customPrimary=custom?.[0];
+    const drivePrimary=drive?.[0]&&ZIP_URLS[drive[0][1]]?drive[0]:null;
+    const primary=customPrimary||drivePrimary;
     const cover=primary
-      ? `<img src="${imageUrl(primary[1])}" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`
+      ? `<img loading="lazy" decoding="async" src="${imageUrl(primary[1])}" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`
       : g.id==='football'
-        ? `<img src="${imageUrl(FOOTBALL_IMAGES[1][1])}" alt="足球基本知識">`
+        ? `<img loading="lazy" decoding="async" src="${imageUrl(FOOTBALL_IMAGES[1][1])}" alt="足球基本知識">`
         : `<span class="emoji">${g.emoji}</span>`;
     return `<article class="guide-card" data-open="${g.id}"><div class="cover">${cover}<span class="badge">${esc(g.category)}</span></div><div class="card-body"><div class="card-meta">${g.tags.slice(0,4).map(esc).join(' ・ ')}</div><h3>${esc(g.title)}</h3><p>${esc(g.intro)}</p></div><div class="card-footer"><span>${g.sections.length} 個章節</span><b>查看完整教學 →</b></div></article>`;
   }).join('');
@@ -103,29 +114,51 @@ function renderStats(){
   $('#heroStats').innerHTML=`<div class="stat"><b>${GUIDES.length}</b><span>教學主題</span></div><div class="stat"><b>${sectionCount}</b><span>教學章節</span></div><div class="stat"><b>${driveCount+customCount+7}</b><span>教學圖片</span></div><div class="stat"><b>3</b><span>主要分類</span></div>`;
 }
 function renderAll(){renderNav();renderCards();renderStats();}
+function imageGrid(imgs){
+  return `<div class="football-grid">${imgs.map(([name,file])=>`<div class="football-img" data-img="${esc(file)}" data-name="${esc(name)}"><img loading="lazy" decoding="async" src="${imageUrl(file)}" alt="${esc(name)}" onerror="this.closest('.football-img').style.display='none'"><b>${esc(name)}｜點擊看大圖</b></div>`).join('')}</div>`;
+}
 function renderSection(s){
   let body='';
   if(s.boxes){body+=`<div class="lesson-grid">${s.boxes.map(([h,p])=>`<div class="lesson-box"><h4>${esc(h)}</h4><p>${esc(p)}</p></div>`).join('')}</div>`;}
   if(s.list){body+=`<div class="lesson-box"><p>${s.list.map((x,i)=>`${i+1}. ${esc(x)}`).join('\n\n')}</p></div>`;}
   if(s.table){body+=`<div class="table-wrap"><table class="simple-table"><thead><tr>${s.table.headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${s.table.rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;}
-  if(s.footballImages){body+=`<div class="football-grid">${FOOTBALL_IMAGES.map(([name,file])=>`<div class="football-img" data-img="${esc(file)}" data-name="${esc(name)}"><img src="${imageUrl(file)}" alt="${esc(name)}"><b>${esc(name)}｜點擊看大圖</b></div>`).join('')}</div>`;}
+  if(s.footballImages){body+=imageGrid(FOOTBALL_IMAGES);}
+  if(s.images?.length){body+=imageGrid(s.images);}
   if(s.note){body+=`<div class="lesson-note">${esc(s.note)}</div>`;}
   return `<section class="lesson-section"><h3>${esc(s.title)}</h3>${body}</section>`;
 }
 function renderImageGallery(id){
-  const imgs=[...(CUSTOM_IMAGES[id]||[]),...(DRIVE_IMAGES[id]||[])];
-  if(!imgs.length)return '';
-  return `<section class="lesson-section"><h3>教學圖片</h3><div class="football-grid">${imgs.map(([name,file])=>`<div class="football-img" data-img="${esc(file)}" data-name="${esc(name)}"><img src="${imageUrl(file)}" alt="${esc(name)}" onerror="this.closest('.football-img').style.display='none'"><b>${esc(name)}｜點擊看大圖</b></div>`).join('')}</div></section>`;
+  const guide=GUIDES.find(g=>g.id===id);
+  const sectionFiles=new Set((guide?.sections||[]).flatMap(s=>(s.images||[]).map(x=>x[1])));
+  const custom=(CUSTOM_IMAGES[id]||[]).filter(x=>!sectionFiles.has(x[1]));
+  const drive=(DRIVE_IMAGES[id]||[]).filter(x=>ZIP_URLS[x[1]]);
+  const imgs=[...custom,...drive];
+  const loading=(DRIVE_IMAGES[id]?.length&&!driveZipLoaded)?`<div class="lesson-note" data-drive-loading>教學圖片載入中…</div>`:'';
+  if(!imgs.length&&!loading)return '';
+  return `<section class="lesson-section"><h3>教學圖片</h3>${imgs.length?imageGrid(imgs):''}${loading}</section>`;
 }
-function openGuide(id){
+function bindImageZoom(){
+  document.querySelectorAll('[data-img]').forEach(el=>el.onclick=()=>openZoom(el.dataset.img,el.dataset.name));
+}
+function openGuide(id,skipLazyLoad=false){
   const g=GUIDES.find(x=>x.id===id);if(!g)return;
   $('#detailCategory').textContent=g.category;
   $('#detailTitle').textContent=`${g.emoji} ${g.title}`;
   $('#detailIntro').textContent=g.intro;
   $('#detailBody').innerHTML=g.sections.map(renderSection).join('')+renderImageGallery(id)+`<div class="lesson-note warn">提醒：遊戲館別、桌型、特殊邊注、派彩與有效投注規則可能不同；實際操作與客服回覆時，仍以玩家當下遊戲畫面／桌面規則為準。</div>`;
   $('#overlay').classList.add('show');$('#detail').classList.add('show');document.body.style.overflow='hidden';
-  document.querySelectorAll('[data-img]').forEach(el=>el.onclick=()=>openZoom(el.dataset.img,el.dataset.name));
-  location.hash=`guide=${encodeURIComponent(id)}`;
+  bindImageZoom();
+  if(location.hash!==`#guide=${encodeURIComponent(id)}`)location.hash=`guide=${encodeURIComponent(id)}`;
+
+  // 只有真的打開需要 Drive 圖片的教學時，才下載 4.7MB 圖片壓縮包。
+  if(!skipLazyLoad&&DRIVE_IMAGES[id]?.length&&!driveZipLoaded){
+    loadDriveImagesFromZip().then(ok=>{
+      if(!ok)return;
+      renderCards();
+      const current=location.hash.startsWith('#guide=')?decodeURIComponent(location.hash.slice(7)):'';
+      if(current===id&&$('#detail').classList.contains('show'))openGuide(id,true);
+    });
+  }
 }
 function closeDetail(){
   $('#overlay').classList.remove('show');$('#detail').classList.remove('show');document.body.style.overflow='';
@@ -142,8 +175,8 @@ $('#closeDetail').onclick=closeDetail;
 $('#overlay').onclick=()=>{$('#sidebar').classList.contains('open')?closeSidebar():closeDetail();};
 $('#menuBtn').onclick=openSidebar;$('#mobileClose').onclick=closeSidebar;
 
-async function boot(){
-  await loadDriveImagesFromZip();
+function boot(){
+  // 首頁先立即顯示，不再等待 4.7MB 圖片 ZIP 下載完成。
   renderAll();
   if(location.hash.startsWith('#guide=')){
     const id=decodeURIComponent(location.hash.slice(7));
