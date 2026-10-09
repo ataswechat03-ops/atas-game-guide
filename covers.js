@@ -9,8 +9,8 @@
     'football-europe':'歐洲盤賠率入門資訊圖表.png',
     'football-hongkong':'香港盤賠率計算入門圖解.png',
     'football-malay':'馬來盤新手速懂足球賠率圖解.png',
-    'football-indo':'images/covers/indonesia-new.webp',
-    'football-american':'images/covers/american-new.webp'
+    'football-indo':'images/covers/indonesia-new.webp?v=2',
+    'football-american':'images/covers/american-new.webp?v=2'
   };
 
   const style=document.createElement('style');
@@ -24,7 +24,8 @@
   function coverHtml(g){
     const file=COVER_FILES[g.id];
     if(file){
-      return `<img loading="lazy" decoding="async" src="${imageUrl(file)}" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`;
+      const src=file.includes('?') ? RAW+file : imageUrl(file);
+      return `<img loading="lazy" decoding="async" src="${src}" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`;
     }
     const drive=DRIVE_IMAGES[g.id];
     if(drive?.[0]&&ZIP_URLS[drive[0][1]]){
