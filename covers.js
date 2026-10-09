@@ -2,7 +2,7 @@
   'use strict';
 
   // 首頁卡片專用封面：使用 4×3 Sprite；每格皆為 3:1，避免拉伸變形。
-  const SPRITE='images/covers/tutorial-covers.webp?v=4';
+  const SPRITE='images/covers/tutorial-covers.webp?v=5';
   const POS={
     slots:[0,0],
     baccarat:[1,0],
