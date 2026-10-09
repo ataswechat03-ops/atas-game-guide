@@ -1,8 +1,7 @@
 (()=>{
   'use strict';
 
-  // 首頁封面改回「獨立高清圖片」來源，避免低解析 Sprite 被放大後模糊。
-  // 真人前四項直接使用 Google Drive 教學原圖；其餘使用 repository 內的獨立高清圖。
+  // 首頁封面：每個教學使用獨立圖片，避免合併圖放大造成模糊。
   const COVER_FILES={
     sedie:'色碟玩法一看就懂.webp',
     fantan:'番攤一看就懂_開獎下注教學.png',
@@ -10,8 +9,8 @@
     'football-europe':'歐洲盤賠率入門資訊圖表.png',
     'football-hongkong':'香港盤賠率計算入門圖解.png',
     'football-malay':'馬來盤新手速懂足球賠率圖解.png',
-    'football-indo':'印尼盤快速計算足球資訊圖.png',
-    'football-american':'美國盤投注教學資訊圖表.png'
+    'football-indo':'images/covers/indonesia-new.webp',
+    'football-american':'images/covers/american-new.webp'
   };
 
   const style=document.createElement('style');
@@ -27,12 +26,10 @@
     if(file){
       return `<img loading="lazy" decoding="async" src="${imageUrl(file)}" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`;
     }
-
     const drive=DRIVE_IMAGES[g.id];
     if(drive?.[0]&&ZIP_URLS[drive[0][1]]){
       return `<img loading="lazy" decoding="async" src="${imageUrl(drive[0][1])}" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`;
     }
-
     return `<span class="emoji">${g.emoji}</span>`;
   }
 
@@ -41,16 +38,13 @@
     $('#count').textContent=`共 ${list.length} 篇`;
     $('#sectionTitle').textContent=activeCategory==='全部'?'全部教學':activeCategory;
     $('#empty').style.display=list.length?'none':'block';
-
     $('#guideGrid').innerHTML=list.map(g=>{
       const cover=coverHtml(g);
       return `<article class="guide-card" data-open="${g.id}"><div class="cover">${cover}<span class="badge">${esc(g.category)}</span></div><div class="card-body"><div class="card-meta">${(g.tags||[]).slice(0,4).map(esc).join(' ・ ')}</div><h3>${esc(g.title)}</h3><p>${esc(g.intro)}</p></div><div class="card-footer"><span>${g.sections.length} 個章節</span><b>查看完整教學 →</b></div></article>`;
     }).join('');
-
     document.querySelectorAll('[data-open]').forEach(c=>c.onclick=()=>openGuide(c.dataset.open));
   };
 
-  // 先立即畫面，真人前四項先顯示圖示；Drive 圖載入完成後自動換成高清圖。
   renderCards();
   loadDriveImagesFromZip().then(ok=>{if(ok)renderCards();});
 })();
