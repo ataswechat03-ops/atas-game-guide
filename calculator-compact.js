@@ -39,13 +39,9 @@
     cards.forEach((card,i)=>card.classList.toggle('active',i===index));
     tabs.forEach((tab,i)=>{tab.classList.toggle('active',i===index);tab.setAttribute('aria-selected',i===index?'true':'false');});
     if(label)label.textContent=names[index]||'';
-    try{localStorage.setItem('atas_odds_calc_tab',String(index));}catch{}
   }
   tabs.forEach((tab,i)=>tab.addEventListener('click',()=>activate(i)));
-  let initial=2;
-  try{
-    const saved=Number(localStorage.getItem('atas_odds_calc_tab'));
-    if(Number.isInteger(saved)&&saved>=0&&saved<cards.length)initial=saved;
-  }catch{}
-  activate(initial);
+
+  // 每次進入頁面預設顯示第一個「歐洲盤」。
+  activate(0);
 })();
