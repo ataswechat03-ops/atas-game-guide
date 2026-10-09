@@ -1,31 +1,40 @@
 (()=>{
   'use strict';
 
-  // 首頁卡片專用封面：使用 4×3 Sprite；每格皆為 3:1，避免拉伸變形。
-  const SPRITE='images/covers/tutorial-covers.webp?v=5';
-  const POS={
-    slots:[0,0],
-    baccarat:[1,0],
-    sicbo:[2,0],
-    roulette:[3,0],
-    sedie:[0,1],
-    fantan:[1,1],
-    football:[2,1],
-    'football-europe':[3,1],
-    'football-hongkong':[0,2],
-    'football-malay':[1,2],
-    'football-indo':[2,2],
-    'football-american':[3,2]
+  // 首頁封面改回「獨立高清圖片」來源，避免低解析 Sprite 被放大後模糊。
+  // 真人前四項直接使用 Google Drive 教學原圖；其餘使用 repository 內的獨立高清圖。
+  const COVER_FILES={
+    sedie:'色碟玩法一看就懂.webp',
+    fantan:'番攤一看就懂_開獎下注教學.png',
+    football:'足球讓分一看就懂攻略.png',
+    'football-europe':'歐洲盤賠率入門資訊圖表.png',
+    'football-hongkong':'香港盤賠率計算入門圖解.png',
+    'football-malay':'馬來盤新手速懂足球賠率圖解.png',
+    'football-indo':'印尼盤快速計算足球資訊圖.png',
+    'football-american':'美國盤投注教學資訊圖表.png'
   };
-  const XP=[0,33.333333,66.666667,100];
-  const YP=[0,50,100];
 
   const style=document.createElement('style');
   style.textContent=`
-    .guide-card .cover{height:auto!important;aspect-ratio:3/1;overflow:hidden}
-    .cover-sprite{display:block;width:100%;height:100%;background-image:url('${SPRITE}');background-repeat:no-repeat;background-size:400% 300%;background-color:#0c1a2c}
+    .guide-card .cover{height:auto!important;aspect-ratio:3/1;overflow:hidden;background:#0c1a2c}
+    .guide-card .cover>img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+    .guide-card .cover .emoji{width:100%;height:100%;display:grid;place-items:center;font-size:58px;background:radial-gradient(circle at 65% 20%,#1687ff33,transparent 32%),linear-gradient(135deg,#142943,#0c1727)}
   `;
   document.head.appendChild(style);
+
+  function coverHtml(g){
+    const file=COVER_FILES[g.id];
+    if(file){
+      return `<img loading="lazy" decoding="async" src="${imageUrl(file)}" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`;
+    }
+
+    const drive=DRIVE_IMAGES[g.id];
+    if(drive?.[0]&&ZIP_URLS[drive[0][1]]){
+      return `<img loading="lazy" decoding="async" src="${imageUrl(drive[0][1])}" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`;
+    }
+
+    return `<span class="emoji">${g.emoji}</span>`;
+  }
 
   renderCards=function(){
     const list=visibleGuides();
@@ -34,25 +43,14 @@
     $('#empty').style.display=list.length?'none':'block';
 
     $('#guideGrid').innerHTML=list.map(g=>{
-      const pos=POS[g.id];
-      let cover='';
-      if(pos){
-        cover=`<span class="cover-sprite" role="img" aria-label="${esc(g.title)}" style="background-position:${XP[pos[0]]}% ${YP[pos[1]]}%"></span>`;
-      }else{
-        const custom=CUSTOM_IMAGES[g.id];
-        const drive=DRIVE_IMAGES[g.id];
-        const customPrimary=custom?.[0];
-        const drivePrimary=drive?.[0]&&ZIP_URLS[drive[0][1]]?drive[0]:null;
-        const primary=customPrimary||drivePrimary;
-        cover=primary
-          ? `<img loading="lazy" decoding="async" src="${imageUrl(primary[1])}" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`
-          : `<span class="emoji">${g.emoji}</span>`;
-      }
+      const cover=coverHtml(g);
       return `<article class="guide-card" data-open="${g.id}"><div class="cover">${cover}<span class="badge">${esc(g.category)}</span></div><div class="card-body"><div class="card-meta">${(g.tags||[]).slice(0,4).map(esc).join(' ・ ')}</div><h3>${esc(g.title)}</h3><p>${esc(g.intro)}</p></div><div class="card-footer"><span>${g.sections.length} 個章節</span><b>查看完整教學 →</b></div></article>`;
     }).join('');
 
     document.querySelectorAll('[data-open]').forEach(c=>c.onclick=()=>openGuide(c.dataset.open));
   };
 
+  // 先立即畫面，真人前四項先顯示圖示；Drive 圖載入完成後自動換成高清圖。
   renderCards();
+  loadDriveImagesFromZip().then(ok=>{if(ok)renderCards();});
 })();
