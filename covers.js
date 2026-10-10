@@ -12,8 +12,8 @@
     'football-europe':'images/covers/europe.svg',
     'football-hongkong':'images/covers/hongkong.svg',
     'football-malay':'images/covers/malay.svg',
-    'football-indo':'images/covers/indonesia.webp',
-    'football-american':'images/covers/american.webp'
+    'football-indo':'images/covers/indonesia.svg',
+    'football-american':'images/covers/american.svg'
   };
 
   const style=document.createElement('style');
@@ -45,7 +45,7 @@
   function coverHtml(g){
     const file=COVER_IMAGES[g.id];
     if(!file)return `<span class="emoji">${g.emoji}</span>`;
-    return `<img loading="lazy" decoding="async" src="${coverUrl(file)}?v=stable-cover-20261010d" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`;
+    return `<img loading="lazy" decoding="async" src="${coverUrl(file)}?v=stable-cover-20261010e" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`;
   }
 
   renderCards=function(){
