@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400" viewBox="0 0 1200 400">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#170709"/><stop offset="1" stop-color="#6d0b08"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff6bd"/><stop offset=".28" stop-color="#ffd86b"/><stop offset=".62" stop-color="#d99a22"/><stop offset="1" stop-color="#fff1a0"/></linearGradient>
+<radialGradient id="glow"><stop stop-color="#ffd36b" stop-opacity=".95"/><stop offset="1" stop-color="#ff5b16" stop-opacity="0"/></radialGradient>
+<filter id="shadow"><feGaussianBlur in="SourceAlpha" stdDeviation="5" result="b"/><feOffset dy="5" result="o"/><feFlood flood-color="#000" flood-opacity=".8"/><feComposite in2="o" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="soft"><feGaussianBlur stdDeviation="16"/></filter>
+<filter id="neon"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<style>
+ text{font-family:"Noto Sans TC","Microsoft JhengHei","PingFang TC",sans-serif}
+ .title{font-size:88px;font-weight:900;letter-spacing:2px;fill:url(#gold);filter:url(#shadow)}
+ .sub{font-size:30px;font-weight:800;fill:#fff;letter-spacing:4px}
+ .tag{font-size:20px;font-weight:800;fill:#f8e6aa;letter-spacing:2px}
+ .brand{font-size:22px;font-weight:800;fill:#fbe9a7;letter-spacing:2px}
+ .small{font-size:18px;font-weight:700;fill:#dbe8ff}
+ .odds{font-size:52px;font-weight:900;fill:#fff}
+</style>
+<rect width="1200" height="400" fill="url(#bg)"/>
+<circle cx="950" cy="160" r="230" fill="url(#glow)" opacity=".25"/>
+<circle cx="110" cy="380" r="180" fill="url(#glow)" opacity=".12"/>
+<g opacity=".25" fill="#fff"><circle cx="40" cy="34" r="3"/><circle cx="113" cy="52" r="4"/><circle cx="186" cy="70" r="5"/><circle cx="259" cy="34" r="6"/><circle cx="332" cy="52" r="3"/><circle cx="405" cy="70" r="4"/><circle cx="478" cy="34" r="5"/><circle cx="551" cy="52" r="6"/><circle cx="624" cy="70" r="3"/><circle cx="697" cy="34" r="4"/><circle cx="770" cy="52" r="5"/><circle cx="843" cy="70" r="6"/><circle cx="916" cy="34" r="3"/><circle cx="989" cy="52" r="4"/><circle cx="1062" cy="70" r="5"/><circle cx="1135" cy="34" r="6"/></g>
+<path d="M0 360 C280 305 520 405 760 340 S1050 315 1200 350" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="2"/>
+<g transform="translate(48,34)"><rect width="300" height="52" rx="26" fill="#070b12" fill-opacity=".84" stroke="#e9c45f" stroke-width="2"/><text x="26" y="34" class="brand">♠  ATAS 遊戲教學</text></g>
+<g transform="translate(365,34)"><rect width="150" height="52" rx="26" fill="#101827" fill-opacity=".88" stroke="#e9c45f" stroke-width="2"/><text x="75" y="34" text-anchor="middle" class="brand">電子遊戲</text></g>
+<text x="60" y="190" class="title">老虎機</text><text x="62" y="246" class="sub">基本計算知識</text><text x="64" y="292" class="tag">LINE · WAYS · CLUSTER · WILD</text>
+<g transform="translate(720,85)" filter="url(#shadow)"><rect width="390" height="235" rx="34" fill="#280b08" stroke="#f2c45b" stroke-width="6"/><rect x="25" y="38" width="340" height="142" rx="18" fill="#fff9e8" stroke="#d89b25" stroke-width="6"/>
+<g font-family="serif" font-size="112" font-weight="900" fill="#c30d13" stroke="#6e0000" stroke-width="3"><text x="58" y="152">7</text><text x="151" y="152">7</text><text x="245" y="152">7</text></g>
+<text x="195" y="215" text-anchor="middle" font-size="26" font-weight="900" fill="#ffeaa0">JACKPOT</text></g>
+<g fill="#f4c748" opacity=".9"><circle cx="676" cy="92" r="18"/><circle cx="1110" cy="330" r="24"/><circle cx="675" cy="320" r="11"/></g></svg>
