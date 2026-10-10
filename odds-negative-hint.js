@@ -33,10 +33,10 @@
       if(!(stake>=0)||!Number.isFinite(odds)||odds>=0){box.style.display='none';return;}
       box.style.display='block';
       const ratio=c.kind==='american'?Math.abs(odds)/100:Math.abs(odds);
-      const fullLoss=stake*ratio;
-      const halfLoss=fullLoss/2;
+      const full=stake*ratio;
+      const half=full/2;
       const shown=c.kind==='american'?`${Math.abs(odds)}%`:`${Math.abs(odds)}`;
-      box.innerHTML=`<b style="color:#dceaff">負數盤已套用：</b> 全贏只看本金，所以修改負數賠率時「全贏」金額不會變。<br>目前 ${shown}：全輸會扣 <b style="color:#ffbf69">${money(fullLoss)}</b>，輸半會扣 <b style="color:#ffbf69">${money(halfLoss)}</b>。`;
+      box.innerHTML=`<b style="color:#dceaff">負數盤已套用：</b> 贏、輸都會乘賠率倍率。<br>目前 ${shown}：全贏淨利 <b style="color:#78e19d">${money(full)}</b>，贏半淨利 <b style="color:#78e19d">${money(half)}</b>；全輸扣 <b style="color:#ffbf69">${money(full)}</b>，輸半扣 <b style="color:#ffbf69">${money(half)}</b>。`;
     });
   }
 
