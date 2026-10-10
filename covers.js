@@ -2,12 +2,12 @@
   'use strict';
 
   const COVER_IMAGES={
-    slots:'images/covers/slots.webp',
-    baccarat:'images/covers/baccarat.webp',
-    sicbo:'images/covers/sicbo.webp',
-    roulette:'images/covers/roulette.webp',
-    sedie:'images/covers/sedie.webp',
-    fantan:'images/covers/fantan.webp',
+    slots:'images/covers/slots.svg',
+    baccarat:'images/covers/baccarat.svg',
+    sicbo:'images/covers/sicbo.svg',
+    roulette:'images/covers/roulette.svg',
+    sedie:'images/covers/sedie.svg',
+    fantan:'images/covers/fantan.svg',
     football:'images/covers/football.svg',
     'football-europe':'images/covers/europe.svg',
     'football-hongkong':'images/covers/hongkong.svg',
@@ -40,13 +40,12 @@
   `;
   document.head.appendChild(style);
 
-  // 封面直接走 GitHub Pages 同源路徑，避免 raw.githubusercontent 的跨來源與快取差異。
   const coverUrl=file=>String(file??'').split('/').map(encodeURIComponent).join('/');
 
   function coverHtml(g){
     const file=COVER_IMAGES[g.id];
     if(!file)return `<span class="emoji">${g.emoji}</span>`;
-    return `<img loading="lazy" decoding="async" src="${coverUrl(file)}?v=stable-cover-20261010c" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`;
+    return `<img loading="lazy" decoding="async" src="${coverUrl(file)}?v=stable-cover-20261010d" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`;
   }
 
   renderCards=function(){
