@@ -13,16 +13,14 @@
     {name:'美國盤',stake:'#usStake',odds:'#usOdds',out1:'#usProfit',out2:'#usTotal',kind:'american'}
   ];
 
+  function ratio(kind,odds){
+    return kind==='american'?Math.abs(odds)/100:Math.abs(odds);
+  }
+
   function positiveProfit(kind,stake,odds){
     if(kind==='europe')return odds>1?stake*(odds-1):NaN;
     if(kind==='hk'||kind==='asian')return odds>=0?stake*odds:NaN;
     if(kind==='american')return odds>0?stake*(odds/100):NaN;
-    return NaN;
-  }
-
-  function negativeLoss(kind,stake,odds){
-    if(kind==='asian')return stake*Math.abs(odds);
-    if(kind==='american')return stake*(Math.abs(odds)/100);
     return NaN;
   }
 
@@ -35,13 +33,13 @@
   }
 
   function settleNegative(kind,stake,odds,status){
-    const loss=negativeLoss(kind,stake,odds);
-    if(!Number.isFinite(loss))return null;
-    if(status==='halfwin')return {net:stake/2,total:stake+stake/2};
+    const amount=stake*ratio(kind,odds);
+    if(!Number.isFinite(amount))return null;
+    if(status==='halfwin')return {net:amount/2,total:stake+amount/2};
     if(status==='push')return {net:0,total:stake};
-    if(status==='halfloss')return {net:-loss/2,total:stake-loss/2};
-    if(status==='loss')return {net:-loss,total:stake-loss};
-    return {net:stake,total:stake+stake};
+    if(status==='halfloss')return {net:-amount/2,total:stake-amount/2};
+    if(status==='loss')return {net:-amount,total:stake-amount};
+    return {net:amount,total:stake+amount};
   }
 
   function recalc(){
@@ -56,7 +54,6 @@
       const status=card.querySelector('.settlement-select')?.value||'win';
       if(!(stake>=0)||!Number.isFinite(odds)){set(d.out1,'—');set(d.out2,'—');return;}
 
-      // 馬來盤「我想淨贏多少」保留原反推模式。
       if(d.kind==='asian'&&d.name==='馬來盤'&&document.querySelector('#mlMode')?.value==='target')return;
 
       let r=null;
