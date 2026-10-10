@@ -1,64 +1,49 @@
 (()=>{
   'use strict';
 
-  const ORDER=[
-    'slots','baccarat','sicbo','roulette',
-    'sedie','fantan','football','football-europe',
-    'football-hongkong','football-malay','football-indo','football-american'
-  ];
-
-  const SPRITE_PARTS=[
-    'part00.txt','part01.txt','part02.txt','part03.txt','part04.txt','part05.txt',
-    'part06_07.txt','part08.txt','part09.txt','part10.txt','part11.txt','part12.txt'
-  ];
-
-  let spriteUrl='';
+  const COVER_IMAGES={
+    slots:'images/covers/slots.webp',
+    baccarat:'images/covers/baccarat.webp',
+    sicbo:'images/covers/sicbo.webp',
+    roulette:'images/covers/roulette.webp',
+    sedie:'images/covers/sedie.webp',
+    fantan:'images/covers/fantan.webp',
+    football:'images/covers/football.webp',
+    'football-europe':'images/covers/europe.webp',
+    'football-hongkong':'images/covers/hongkong.png',
+    'football-malay':'images/covers/malay.png',
+    'football-indo':'images/covers/indonesia.webp',
+    'football-american':'images/covers/american.webp'
+  };
 
   const style=document.createElement('style');
   style.textContent=`
     .guide-card .cover{
       height:auto!important;
-      aspect-ratio:2.265/1;
+      aspect-ratio:3/1;
       overflow:hidden;
       background:#0c1a2c;
       position:relative
     }
-    .guide-card .cover-art{
-      position:absolute;
-      inset:0;
-      background-repeat:no-repeat;
-      background-size:400% 300%;
-      background-color:#0c1a2c
+    .guide-card .cover>img{
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center
     }
     .guide-card .cover .emoji{
       width:100%;height:100%;display:grid;place-items:center;font-size:58px;
       background:linear-gradient(135deg,#142943,#0c1727)
     }
     .guide-card .cover .badge{position:absolute;z-index:2}
-    .cover-loading{
-      position:absolute;inset:0;
-      background:linear-gradient(110deg,#101d30 25%,#1b2d46 40%,#101d30 55%);
-      background-size:220% 100%;animation:coverShimmer 1.2s linear infinite
-    }
-    @keyframes coverShimmer{to{background-position-x:-220%}}
   `;
   document.head.appendChild(style);
 
-  function pos(id){
-    const i=ORDER.indexOf(id);
-    if(i<0)return null;
-    const col=i%4;
-    const row=Math.floor(i/4);
-    return `${col*100/3}% ${row*50}%`;
-  }
-
   function coverHtml(g){
-    const p=pos(g.id);
-    if(spriteUrl&&p){
-      return `<div class="cover-art" style="background-image:url('${spriteUrl}');background-position:${p}" role="img" aria-label="${esc(g.title)}"></div>`;
-    }
-    if(p)return '<div class="cover-loading"></div>';
-    return `<span class="emoji">${g.emoji}</span>`;
+    const file=COVER_IMAGES[g.id];
+    if(!file)return `<span class="emoji">${g.emoji}</span>`;
+    return `<img loading="lazy" decoding="async" src="${imageUrl(file)}?v=stable-20261010" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`;
   }
 
   renderCards=function(){
@@ -70,26 +55,5 @@
     document.querySelectorAll('[data-open]').forEach(c=>c.onclick=()=>openGuide(c.dataset.open));
   };
 
-  async function loadSprite(){
-    try{
-      const base='images/covers/cinematic-parts/';
-      const parts=await Promise.all(SPRITE_PARTS.map(async file=>{
-        const r=await fetch(`${base}${file}?v=cinematic3`,{cache:'no-store'});
-        if(!r.ok)throw new Error(`${file}: ${r.status}`);
-        return (await r.text()).trim();
-      }));
-      const b64=parts.join('').replace(/\s+/g,'');
-      const bin=atob(b64);
-      const bytes=new Uint8Array(bin.length);
-      for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
-      spriteUrl=URL.createObjectURL(new Blob([bytes],{type:'image/webp'}));
-      renderCards();
-    }catch(err){
-      console.warn('Cinematic covers failed to load:',err);
-      renderCards();
-    }
-  }
-
   renderCards();
-  loadSprite();
 })();
