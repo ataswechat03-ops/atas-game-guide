@@ -40,12 +40,13 @@
   `;
   document.head.appendChild(style);
 
-  const coverUrl=file=>RAW+file.split('/').map(encodeURIComponent).join('/');
+  // 封面直接走 GitHub Pages 同源路徑，避免 raw.githubusercontent 的跨來源與快取差異。
+  const coverUrl=file=>String(file??'').split('/').map(encodeURIComponent).join('/');
 
   function coverHtml(g){
     const file=COVER_IMAGES[g.id];
     if(!file)return `<span class="emoji">${g.emoji}</span>`;
-    return `<img loading="lazy" decoding="async" src="${coverUrl(file)}?v=fix-path-20261010" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`;
+    return `<img loading="lazy" decoding="async" src="${coverUrl(file)}?v=stable-cover-20261010c" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`;
   }
 
   renderCards=function(){
