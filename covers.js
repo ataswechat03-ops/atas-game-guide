@@ -8,10 +8,10 @@
     roulette:'images/covers/roulette.webp',
     sedie:'images/covers/sedie.webp',
     fantan:'images/covers/fantan.webp',
-    football:'images/covers/football.webp',
-    'football-europe':'images/covers/europe.webp',
-    'football-hongkong':'images/covers/hongkong.png',
-    'football-malay':'images/covers/malay.png',
+    football:'images/covers/football.svg',
+    'football-europe':'images/covers/europe.svg',
+    'football-hongkong':'images/covers/hongkong.svg',
+    'football-malay':'images/covers/malay.svg',
     'football-indo':'images/covers/indonesia.webp',
     'football-american':'images/covers/american.webp'
   };
@@ -43,7 +43,7 @@
   function coverHtml(g){
     const file=COVER_IMAGES[g.id];
     if(!file)return `<span class="emoji">${g.emoji}</span>`;
-    return `<img loading="lazy" decoding="async" src="${imageUrl(file)}?v=stable-20261010" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`;
+    return `<img loading="lazy" decoding="async" src="${imageUrl(file)}?v=hd-covers-20261010-3" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`;
   }
 
   renderCards=function(){
