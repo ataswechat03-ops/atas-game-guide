@@ -3,7 +3,9 @@ const ZIP_FILE='ATAS_GoogleDrive_教學圖片_22張.zip';
 const ZIP_URLS={};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const imageUrl=f=>ZIP_URLS[f]||RAW+encodeURIComponent(f);
+// 本站圖片一律走 GitHub Pages 同源相對路徑；逐段編碼，保留資料夾斜線。
+const localImagePath=f=>String(f??'').split('/').map(encodeURIComponent).join('/');
+const imageUrl=f=>ZIP_URLS[f]||localImagePath(f);
 
 // 從 Google Drive《遊戲教學》內嵌圖片整理出的網站圖片。
 const DRIVE_IMAGES={
@@ -150,7 +152,6 @@ function openGuide(id,skipLazyLoad=false){
   bindImageZoom();
   if(location.hash!==`#guide=${encodeURIComponent(id)}`)location.hash=`guide=${encodeURIComponent(id)}`;
 
-  // 只有真的打開需要 Drive 圖片的教學時，才下載 4.7MB 圖片壓縮包。
   if(!skipLazyLoad&&DRIVE_IMAGES[id]?.length&&!driveZipLoaded){
     loadDriveImagesFromZip().then(ok=>{
       if(!ok)return;
@@ -176,7 +177,6 @@ $('#overlay').onclick=()=>{$('#sidebar').classList.contains('open')?closeSidebar
 $('#menuBtn').onclick=openSidebar;$('#mobileClose').onclick=closeSidebar;
 
 function boot(){
-  // 首頁先立即顯示，不再等待 4.7MB 圖片 ZIP 下載完成。
   renderAll();
   if(location.hash.startsWith('#guide=')){
     const id=decodeURIComponent(location.hash.slice(7));
