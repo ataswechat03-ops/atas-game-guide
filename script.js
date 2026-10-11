@@ -3,9 +3,9 @@ const ZIP_FILE='ATAS_GoogleDrive_教學圖片_22張.zip';
 const ZIP_URLS={};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-// 本站圖片一律走 GitHub Pages 同源相對路徑；逐段編碼，保留資料夾斜線。
+// 本站圖片支援 GitHub Pages 相對路徑，也支援後台上傳後取得的完整 HTTPS 網址。
 const localImagePath=f=>String(f??'').split('/').map(encodeURIComponent).join('/');
-const imageUrl=f=>ZIP_URLS[f]||localImagePath(f);
+const imageUrl=f=>{const s=String(f??'');return ZIP_URLS[f]||(/^https?:\/\//i.test(s)?s:localImagePath(s));};
 
 // 從 Google Drive《遊戲教學》內嵌圖片整理出的網站圖片。
 const DRIVE_IMAGES={
