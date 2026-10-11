@@ -2,6 +2,7 @@ services:
   - type: web
     name: atas-game-guide-api
     runtime: docker
+    plan: free
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     healthCheckPath: /api/health
@@ -10,7 +11,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: DB_PATH
-        value: /var/data/atas-guide.db
+        value: /tmp/atas-guide.db
       - key: CORS_ORIGIN
         value: https://ataswechat03-ops.github.io
       - key: JWT_SECRET
@@ -19,7 +20,3 @@ services:
         sync: false
       - key: ADMIN_PASSWORD
         sync: false
-    disk:
-      name: atas-guide-data
-      mountPath: /var/data
-      sizeGB: 1
