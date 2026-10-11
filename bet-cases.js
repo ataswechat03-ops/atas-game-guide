@@ -46,6 +46,7 @@
       formula:'38,000 × 1.23 = 46,740'
     }
   ];
+  window.ATAS_BET_CASES=CASES;
 
   function money(n){return Number.isFinite(n)?`TWD ${n.toLocaleString('zh-TW',{minimumFractionDigits:2,maximumFractionDigits:2})}`:'—'}
 
