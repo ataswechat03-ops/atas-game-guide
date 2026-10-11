@@ -70,17 +70,18 @@ function render(){
   const f=rows.filter(r=>(!t||r.type===t)&&(!q||`${r.title} ${r.slug} ${r.category}`.toLowerCase().includes(q)));
   const counts={all:rows.length,guide:rows.filter(x=>x.type==='guide').length,case:rows.filter(x=>x.type==='case').length,quiz:rows.filter(x=>x.type==='quiz').length};
   $('#stats').innerHTML=`<div><span>全部內容</span><b>${counts.all}</b></div><div><span>教學</span><b>${counts.guide}</b></div><div><span>案例</span><b>${counts.case}</b></div><div><span>測驗</span><b>${counts.quiz}</b></div>`;
-  $('#contentRows').innerHTML=f.map(r=>`<tr><td><span class="badge">${r.type}</span></td><td>${esc(r.title)}</td><td>${esc(r.category||'—')}</td><td><span class="badge ${r.published?'pub':'draft'}">${r.published?'已發布':'草稿'}</span></td><td>${r.sort_order}</td><td><button data-edit="${r.id}">編輯</button></td></tr>`).join('')||'<tr><td colspan="6">目前沒有內容</td></tr>';
+  $('#contentRows').innerHTML=f.map(r=>`<tr draggable="true" data-row-id="${r.id}" data-row-type="${esc(r.type)}"><td class="row-drag" title="拖曳排序">⋮⋮</td><td><span class="badge">${r.type}</span></td><td>${esc(r.title)}</td><td>${esc(r.category||'—')}</td><td><span class="badge ${r.published?'pub':'draft'}">${r.published?'已發布':'草稿'}</span></td><td data-sort-cell>${r.sort_order}</td><td><button data-edit="${r.id}">編輯</button></td></tr>`).join('')||'<tr><td colspan="7">目前沒有內容</td></tr>';
   document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEditor(Number(b.dataset.edit)));
+  window.dispatchEvent(new CustomEvent('atas:admin-render'));
 }
 
 function pairRow(kind,a='',b=''){
   const div=document.createElement('div');div.className='pair-row';div.dataset.kind=kind;
-  div.innerHTML=`<input data-a value="${esc(a)}" placeholder="${kind==='box'?'小標題':'圖片名稱'}"><input data-b value="${esc(b)}" placeholder="${kind==='box'?'內容':'檔案名稱 / 路徑'}"><button type="button" data-pair-remove>刪除</button>`;
+  div.innerHTML=`<input data-a value="${esc(a)}" placeholder="${kind==='box'?'小標題':'圖片名稱'}"><input data-b value="${esc(b)}" placeholder="${kind==='box'?'內容':'檔案名稱 / 圖片網址'}">${kind==='image'?'<button type="button" data-upload-image>上傳</button>':''}<button type="button" data-pair-remove>刪除</button>`;
   div.querySelector('[data-pair-remove]').onclick=()=>div.remove();
   return div;
 }
-function addPair(container,kind,a='',b=''){container.appendChild(pairRow(kind,a,b))}
+function addPair(container,kind,a='',b=''){container.appendChild(pairRow(kind,a,b));if(kind==='image')window.dispatchEvent(new CustomEvent('atas:admin-image-row',{detail:{row:container.lastElementChild}}))}
 function sectionCard(data={}){
   const tpl=$('#sectionTemplate').content.firstElementChild.cloneNode(true);
   tpl.querySelector('[data-sec="title"]').value=data.title||'';
@@ -98,7 +99,7 @@ function sectionCard(data={}){
   tpl.querySelector('[data-move="down"]').onclick=()=>{const n=tpl.nextElementSibling;if(n)tpl.parentNode.insertBefore(n,tpl)};
   return tpl;
 }
-function renderSections(sections=[]){const c=$('#sectionsEditor');c.innerHTML='';sections.forEach(s=>c.appendChild(sectionCard(s)));if(!sections.length)c.appendChild(sectionCard({title:'01｜新章節'}))}
+function renderSections(sections=[]){const c=$('#sectionsEditor');c.innerHTML='';sections.forEach(s=>c.appendChild(sectionCard(s)));if(!sections.length)c.appendChild(sectionCard({title:'01｜新章節'}));window.dispatchEvent(new CustomEvent('atas:admin-sections-render'))}
 function collectPairs(card,kind){return [...card.querySelectorAll(`.pair-row[data-kind="${kind}"]`)].map(r=>[r.querySelector('[data-a]').value.trim(),r.querySelector('[data-b]').value.trim()]).filter(x=>x[0]||x[1])}
 function collectSections(){
   return [...$('#sectionsEditor').querySelectorAll('.section-editor-card')].map(card=>{
@@ -123,13 +124,14 @@ function openEditor(id=null){
   const type=editing?.type||'guide',body=editing?.body||{};
   $('#editorTitle').textContent=editing?'編輯內容':'新增內容';$('#editorKicker').textContent=editing?'EDIT CONTENT':'NEW CONTENT';
   $('#edType').value=type;$('#edSlug').value=editing?.slug||'';$('#edTitle').value=editing?.title||'';$('#edCategory').value=editing?.category||'';$('#edSort').value=editing?.sort_order||0;$('#edPublished').checked=editing?.published??true;
-  $('#edEmoji').value=body.emoji||'';$('#edTags').value=Array.isArray(body.tags)?body.tags.join(', '):'';$('#edIntro').value=body.intro||'';renderSections(Array.isArray(body.sections)?body.sections:[]);
+  $('#edEmoji').value=body.emoji||'';$('#edTags').value=Array.isArray(body.tags)?body.tags.join(', '):'';$('#edIntro').value=body.intro||'';$('#edCover').value=body.cover||'';renderSections(Array.isArray(body.sections)?body.sections:[]);
   $('#caseTag').value=body.tag||'';$('#caseSettlement').value=body.settlement||'';$('#caseMatch').value=body.match||'';$('#caseMarket').value=body.market||'';$('#caseResult').value=body.result||'';$('#caseBase').value=body.base??'';$('#caseRisk').value=body.risk??'';$('#casePnl').value=body.pnl??'';$('#caseExplain').value=body.explain||'';$('#caseFormula').value=body.formula||'';
   $('#quizBody').value=JSON.stringify(body,null,2);$('#edBody').value=JSON.stringify(body,null,2);
   $('#deleteBtn').hidden=!editing;$('#editorMsg').textContent='';setEditorType(type);editor.hidden=false;
+  window.dispatchEvent(new CustomEvent('atas:admin-editor-open',{detail:{type,body}}));
 }
 function buildBody(type){
-  if(type==='guide')return {id:$('#edSlug').value.trim(),title:$('#edTitle').value.trim(),category:$('#edCategory').value.trim(),emoji:$('#edEmoji').value.trim()||'📘',intro:$('#edIntro').value.trim(),tags:$('#edTags').value.split(',').map(x=>x.trim()).filter(Boolean),sections:collectSections()};
+  if(type==='guide')return {id:$('#edSlug').value.trim(),title:$('#edTitle').value.trim(),category:$('#edCategory').value.trim(),emoji:$('#edEmoji').value.trim()||'📘',intro:$('#edIntro').value.trim(),tags:$('#edTags').value.split(',').map(x=>x.trim()).filter(Boolean),cover:$('#edCover').value.trim(),sections:collectSections()};
   if(type==='case'){
     const b={id:$('#edSlug').value.trim(),title:$('#edTitle').value.trim(),tag:$('#caseTag').value.trim(),settlement:$('#caseSettlement').value.trim(),match:$('#caseMatch').value.trim(),market:$('#caseMarket').value.trim(),result:$('#caseResult').value.trim(),explain:$('#caseExplain').value.trim(),formula:$('#caseFormula').value.trim()};
     const base=num($('#caseBase').value),risk=num($('#caseRisk').value),pnl=num($('#casePnl').value);if(base!==null)b.base=base;if(risk!==null)b.risk=risk;b.pnl=pnl;return b;
