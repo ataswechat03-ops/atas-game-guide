@@ -1,0 +1,9 @@
+(()=>{
+'use strict';
+const money=n=>Number.isFinite(Number(n))?`TWD ${Number(n).toLocaleString('zh-TW',{minimumFractionDigits:2,maximumFractionDigits:2})}`:'—';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function card(c){const pnl=Number(c.pnl),loss=Number.isFinite(pnl)&&pnl<0?'loss':'';return `<article class="bet-case" data-case="${esc(c.id)}"><div class="bet-case-top"><h3>${esc(c.title)}</h3><span class="bet-case-tag">${esc(c.tag||c.settlement||'案例')}</span></div><div class="bet-case-meta"><div class="bet-case-row"><span>賽事</span><b>${esc(c.match||'—')}</b></div><div class="bet-case-row"><span>投注</span><b>${esc(c.market||'—')}</b></div><div class="bet-case-row"><span>結果</span><b>${esc(c.result||'—')}</b></div></div><div class="bet-case-kpi"><div><span>基準額</span><b>${money(c.base)}</b></div><div><span>實際押注</span><b>${money(c.risk)}</b></div><div><span>損益</span><b class="${loss}">${money(c.pnl)}</b></div></div><button class="bet-case-btn" type="button">查看計算說明</button><div class="bet-case-detail"><strong>${esc(c.settlement||'')}</strong><br>${esc(c.explain||'')}<br><br><strong>計算：</strong>${esc(c.formula||'—')}</div></article>`}
+function apply(cases){if(!Array.isArray(cases)||!cases.length)return;const root=document.querySelector('#betCases .bet-case-grid');if(!root)return;root.innerHTML=cases.map(card).join('');root.querySelectorAll('.bet-case-btn').forEach(btn=>btn.onclick=()=>btn.closest('.bet-case').classList.toggle('open'));const p=document.querySelector('#betCases .bet-cases-head p');if(p)p.textContent=`目前由後台 API 載入 ${cases.length} 筆已發布案例。`;}
+window.addEventListener('atas:cases-updated',e=>apply(e.detail?.cases));
+if(window.ATAS_API_CASES?.length){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>apply(window.ATAS_API_CASES));else apply(window.ATAS_API_CASES)}
+})();
