@@ -9,7 +9,7 @@ window.ATAS_API_BASE=api;
 
 function normalizeGuide(r){
   const b=r&&r.body&&typeof r.body==='object'?r.body:{};
-  return {id:b.id||r.slug,title:b.title||r.title,category:b.category||r.category||'',emoji:b.emoji||'📘',intro:b.intro||'',tags:Array.isArray(b.tags)?b.tags:[],sections:Array.isArray(b.sections)?b.sections:[]};
+  return {id:b.id||r.slug,title:b.title||r.title,category:b.category||r.category||'',emoji:b.emoji||'📘',intro:b.intro||'',tags:Array.isArray(b.tags)?b.tags:[],cover:b.cover||'',sections:Array.isArray(b.sections)?b.sections:[]};
 }
 function applyGuides(rows){
   if(typeof GUIDES==='undefined'||!Array.isArray(GUIDES))return false;
