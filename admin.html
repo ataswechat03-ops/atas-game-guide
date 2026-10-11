@@ -27,7 +27,8 @@
 
     <section id="appPanel" hidden>
       <div class="stats" id="stats"></div>
-      <div class="toolbar"><select id="typeFilter"><option value="">全部類型</option><option value="guide">教學</option><option value="case">案例</option><option value="quiz">測驗</option></select><input id="searchAdmin" placeholder="搜尋標題 / slug / 分類"><button id="newBtn" class="primary">＋ 新增內容</button></div>
+      <div class="toolbar"><select id="typeFilter"><option value="">全部類型</option><option value="guide">教學</option><option value="case">案例</option><option value="quiz">測驗</option></select><input id="searchAdmin" placeholder="搜尋標題 / slug / 分類"><button id="importLegacyBtn">匯入目前前台資料</button><button id="newBtn" class="primary">＋ 新增內容</button></div>
+      <div id="importMsg" class="msg"></div>
       <section class="panel"><div class="table-wrap"><table><thead><tr><th>類型</th><th>標題</th><th>分類</th><th>狀態</th><th>排序</th><th></th></tr></thead><tbody id="contentRows"></tbody></table></div></section>
     </section>
   </main>
@@ -40,5 +41,7 @@
 <label>排序<input id="edSort" type="number" value="0"></label><label class="check"><input id="edPublished" type="checkbox" checked> 已發布</label>
 <label class="full">內容 JSON<textarea id="edBody" rows="12">{}</textarea></label>
 </div><div class="modal-actions"><button id="deleteBtn" class="danger">刪除</button><button id="saveBtn" class="primary">儲存</button></div><div id="editorMsg" class="msg"></div></div></div>
-<script src="admin.js?v=20261011a"></script>
+<script src="guides.js?v=20261010c"></script>
+<script src="bet-cases.js?v=20261011b"></script>
+<script src="admin.js?v=20261011b"></script>
 </body></html>
