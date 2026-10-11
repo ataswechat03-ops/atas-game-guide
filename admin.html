@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ATAS 教學後台</title>
+<link rel="stylesheet" href="admin.css?v=20261011a">
+</head>
+<body>
+<div class="admin-shell">
+  <aside class="admin-side">
+    <div class="admin-brand"><b>ATAS</b><span>教學後台</span></div>
+    <button data-view="dashboard" class="active">總覽</button>
+    <button data-view="guides">教學管理</button>
+    <button data-view="cases">案例管理</button>
+    <button data-view="quizzes">測驗管理</button>
+    <a href="./" class="back-link">返回前台</a>
+  </aside>
+  <main class="admin-main">
+    <header><div><small>ATAS CONTENT MANAGER</small><h1>內容管理後台</h1></div><div class="api-state" id="apiState">尚未連線</div></header>
+
+    <section id="loginPanel" class="panel login-panel">
+      <h2>後台登入</h2><p>請連接已部署的 ATAS Guide API。GitHub Pages 本身不能執行伺服器端資料庫。</p>
+      <label>API 網址<input id="apiBase" placeholder="例如 https://api.example.com/api"></label>
+      <div class="two"><label>管理員帳號<input id="adminUser" autocomplete="username"></label><label>密碼<input id="adminPass" type="password" autocomplete="current-password"></label></div>
+      <button id="loginBtn" class="primary">登入</button><div id="loginMsg" class="msg"></div>
+    </section>
+
+    <section id="appPanel" hidden>
+      <div class="stats" id="stats"></div>
+      <div class="toolbar"><select id="typeFilter"><option value="">全部類型</option><option value="guide">教學</option><option value="case">案例</option><option value="quiz">測驗</option></select><input id="searchAdmin" placeholder="搜尋標題 / slug / 分類"><button id="newBtn" class="primary">＋ 新增內容</button></div>
+      <section class="panel"><div class="table-wrap"><table><thead><tr><th>類型</th><th>標題</th><th>分類</th><th>狀態</th><th>排序</th><th></th></tr></thead><tbody id="contentRows"></tbody></table></div></section>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="editorModal" hidden><div class="modal-card"><div class="modal-head"><h2 id="editorTitle">新增內容</h2><button id="closeEditor">×</button></div><div class="editor-grid">
+<label>類型<select id="edType"><option value="guide">教學</option><option value="case">案例</option><option value="quiz">測驗</option></select></label>
+<label>Slug<input id="edSlug" placeholder="例如 football-basic"></label>
+<label>標題<input id="edTitle"></label><label>分類<input id="edCategory"></label>
+<label>排序<input id="edSort" type="number" value="0"></label><label class="check"><input id="edPublished" type="checkbox" checked> 已發布</label>
+<label class="full">內容 JSON<textarea id="edBody" rows="12">{}</textarea></label>
+</div><div class="modal-actions"><button id="deleteBtn" class="danger">刪除</button><button id="saveBtn" class="primary">儲存</button></div><div id="editorMsg" class="msg"></div></div></div>
+<script src="admin.js?v=20261011a"></script>
+</body></html>
