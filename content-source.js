@@ -13,13 +13,27 @@ function normalizeGuide(r){
 }
 function applyGuides(rows){
   if(typeof GUIDES==='undefined'||!Array.isArray(GUIDES))return false;
-  const guides=rows.filter(r=>r.type==='guide').map(normalizeGuide).filter(g=>g.id&&g.title);
-  if(!guides.length)return false;
-  GUIDES.splice(0,GUIDES.length,...guides);
+  const apiGuides=rows.filter(r=>r.type==='guide').map(normalizeGuide).filter(g=>g.id&&g.title);
+  if(!apiGuides.length)return false;
+
+  // API 內容覆蓋同 id 教學，但保留前端動態建立、尚未同步進 API 的教學（例如各足球盤口）。
+  const byId=new Map(GUIDES.map(g=>[g.id,g]));
+  apiGuides.forEach(g=>byId.set(g.id,g));
+  const merged=[];
+  const seen=new Set();
+  GUIDES.forEach(g=>{
+    const v=byId.get(g.id);
+    if(v&&!seen.has(g.id)){merged.push(v);seen.add(g.id);}
+  });
+  apiGuides.forEach(g=>{
+    if(!seen.has(g.id)){merged.push(g);seen.add(g.id);}
+  });
+  GUIDES.splice(0,GUIDES.length,...merged);
+
   try{typeof renderCards==='function'&&renderCards();}catch{}
   try{typeof renderNav==='function'&&renderNav();}catch{}
   try{typeof renderStats==='function'&&renderStats();}catch{}
-  window.dispatchEvent(new CustomEvent('atas:content-updated',{detail:{guides:guides.length}}));
+  window.dispatchEvent(new CustomEvent('atas:content-updated',{detail:{guides:apiGuides.length,total:GUIDES.length}}));
   return true;
 }
 function applyCases(rows){
