@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ATAS 教學後台</title>
-<link rel="stylesheet" href="admin.css?v=20261011d">
+<link rel="stylesheet" href="admin.css?v=20261011e">
 </head>
 <body>
 <div class="admin-shell">
@@ -29,7 +29,8 @@
       <div class="stats" id="stats"></div>
       <div class="toolbar"><select id="typeFilter"><option value="">全部類型</option><option value="guide">教學</option><option value="case">案例</option><option value="quiz">測驗</option></select><input id="searchAdmin" placeholder="搜尋標題 / slug / 分類"><button id="importLegacyBtn">同步前台教學</button><button id="newBtn" class="primary">＋ 新增內容</button></div>
       <div id="importMsg" class="msg"></div>
-      <section class="panel"><div class="table-wrap"><table><thead><tr><th>類型</th><th>標題</th><th>分類</th><th>狀態</th><th>排序</th><th></th></tr></thead><tbody id="contentRows"></tbody></table></div></section>
+      <div class="drag-tip">可直接拖曳內容列調整排序；同類型內容會自動儲存新順序。</div>
+      <section class="panel"><div class="table-wrap"><table><thead><tr><th></th><th>類型</th><th>標題</th><th>分類</th><th>狀態</th><th>排序</th><th></th></tr></thead><tbody id="contentRows"></tbody></table></div></section>
     </section>
   </main>
 </div>
@@ -48,8 +49,12 @@
       <label>圖示 / Emoji<input id="edEmoji" placeholder="⚽"></label>
       <label>標籤<input id="edTags" placeholder="足球, 讓分, 大小盤"></label>
       <label class="full">簡介<textarea id="edIntro" rows="3" placeholder="這篇教學的簡短介紹"></textarea></label>
+      <label class="full">封面圖片
+        <div class="upload-line"><input id="edCover" placeholder="可貼圖片網址，或右邊直接上傳"><button id="uploadCoverBtn" type="button">上傳封面</button><input id="coverFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" hidden></div>
+      </label>
+      <div class="full cover-preview-wrap"><img id="coverPreview" alt="封面預覽"><span id="coverEmpty">尚未設定自訂封面</span></div>
     </div>
-    <div class="section-toolbar"><div><b>教學章節</b><small>直接新增、刪除、排序，不用改 JSON。</small></div><button id="addSectionBtn" type="button">＋ 新增章節</button></div>
+    <div class="section-toolbar"><div><b>教學章節</b><small>可拖曳整個章節調整順序，也可使用上下按鈕。</small></div><button id="addSectionBtn" type="button">＋ 新增章節</button></div>
     <div id="sectionsEditor"></div>
   </section>
 
@@ -74,8 +79,8 @@
 </div></div>
 
 <template id="sectionTemplate">
-  <article class="section-editor-card">
-    <div class="section-card-head"><b>章節</b><div><button type="button" data-move="up">↑</button><button type="button" data-move="down">↓</button><button type="button" data-remove>刪除</button></div></div>
+  <article class="section-editor-card" draggable="true">
+    <div class="section-card-head"><b><span class="drag-handle">⋮⋮</span> 章節</b><div><button type="button" data-move="up">↑</button><button type="button" data-move="down">↓</button><button type="button" data-remove>刪除</button></div></div>
     <label>章節標題<input data-sec="title" placeholder="例如 01｜基本玩法"></label>
     <label>重點卡片 <small>每一組包含「小標題＋內容」</small></label>
     <div data-boxes></div><button type="button" class="sub-add" data-add-box>＋ 新增重點卡片</button>
@@ -91,5 +96,6 @@
 <script src="guides.js?v=20261010c"></script>
 <script src="football-guides-data.js?v=20261011a"></script>
 <script src="bet-cases.js?v=20261011b"></script>
-<script src="admin.js?v=20261011d"></script>
+<script src="admin.js?v=20261011e"></script>
+<script src="admin-media.js?v=20261011a"></script>
 </body></html>
