@@ -13,7 +13,7 @@ const ADMIN_PASSWORD=process.env.ADMIN_PASSWORD||'change-me';
 const CORS_ORIGIN=process.env.CORS_ORIGIN||'*';
 
 app.use(cors({origin:CORS_ORIGIN==='*'?true:CORS_ORIGIN.split(',').map(s=>s.trim())}));
-app.use(express.json({limit:'2mb'}));
+app.use(express.json({limit:'4mb'}));
 
 const db=new Database('atas-guide.db');
 db.pragma('journal_mode = WAL');
@@ -47,6 +47,8 @@ app.post('/api/login',(req,res)=>{const {username,password}=req.body||{};if(user
 app.get('/api/public/content',(req,res)=>{const rows=db.prepare('SELECT * FROM content WHERE published=1 ORDER BY type,sort_order,id').all();res.json(rows.map(rowToJson))});
 app.get('/api/content',auth,(req,res)=>{const rows=db.prepare('SELECT * FROM content ORDER BY type,sort_order,id').all();res.json(rows.map(rowToJson))});
 app.post('/api/content',auth,(req,res)=>{const {type,slug,title,category='',body={},sort_order=0,published=true}=req.body||{};if(!['guide','case','quiz'].includes(type)||!slug||!title)return res.status(400).json({error:'欄位不完整'});try{const info=db.prepare('INSERT INTO content(type,slug,title,category,body,sort_order,published,updated_at) VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP)').run(type,slug,title,category,JSON.stringify(body),Number(sort_order)||0,published?1:0);res.status(201).json(rowToJson(db.prepare('SELECT * FROM content WHERE id=?').get(info.lastInsertRowid)))}catch(e){res.status(409).json({error:'slug 重複或資料格式錯誤'})}});
+app.post('/api/content/bulk',auth,(req,res)=>{const items=Array.isArray(req.body?.items)?req.body.items:[];if(!items.length)return res.status(400).json({error:'沒有可匯入的資料'});const upsert=db.prepare(`INSERT INTO content(type,slug,title,category,body,sort_order,published,updated_at) VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP)
+ON CONFLICT(type,slug) DO UPDATE SET title=excluded.title,category=excluded.category,body=excluded.body,sort_order=excluded.sort_order,published=excluded.published,updated_at=CURRENT_TIMESTAMP`);const tx=db.transaction(list=>{let count=0;for(const x of list){if(!['guide','case','quiz'].includes(x.type)||!x.slug||!x.title)continue;upsert.run(x.type,String(x.slug),String(x.title),String(x.category||''),JSON.stringify(x.body||{}),Number(x.sort_order)||0,x.published===false?0:1);count++}return count});const count=tx(items);res.json({ok:true,count})});
 app.put('/api/content/:id',auth,(req,res)=>{const id=Number(req.params.id);const old=db.prepare('SELECT * FROM content WHERE id=?').get(id);if(!old)return res.status(404).json({error:'找不到資料'});const v={...old,...req.body};db.prepare('UPDATE content SET type=?,slug=?,title=?,category=?,body=?,sort_order=?,published=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(v.type,v.slug,v.title,v.category||'',JSON.stringify(v.body??safeParse(old.body)),Number(v.sort_order)||0,v.published?1:0,id);res.json(rowToJson(db.prepare('SELECT * FROM content WHERE id=?').get(id)))});
 app.delete('/api/content/:id',auth,(req,res)=>{db.prepare('DELETE FROM content WHERE id=?').run(Number(req.params.id));res.status(204).end()});
 app.get('/api/settings',auth,(req,res)=>{const rows=db.prepare('SELECT key,value FROM settings').all();res.json(Object.fromEntries(rows.map(r=>[r.key,safeParse(r.value)])))});
