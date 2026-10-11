@@ -1,6 +1,6 @@
 (()=>{
 'use strict';
-const $=s=>document.querySelector(s);let api=localStorage.getItem('atas-admin-api')||'',token=sessionStorage.getItem('atas-admin-token')||'',rows=[],editing=null;
+const $=s=>document.querySelector(s);const DEFAULT_API='https://atas-game-guide-api-production.up.railway.app/api';let api=localStorage.getItem('atas-admin-api')||DEFAULT_API,token=sessionStorage.getItem('atas-admin-token')||'',rows=[],editing=null;
 const state=$('#apiState'),loginPanel=$('#loginPanel'),appPanel=$('#appPanel'),msg=$('#loginMsg'),editor=$('#editorModal');
 $('#apiBase').value=api;
 function setState(t,ok=false){state.textContent=t;state.style.color=ok?'#72e2ac':'#9eb4c8'}
