@@ -1,8 +1,9 @@
 (()=>{
 'use strict';
 const API_KEY='atas-api-base';
+const DEFAULT_API='https://atas-game-guide-api-production.up.railway.app/api';
 const adminApi=localStorage.getItem('atas-admin-api')||'';
-const api=(localStorage.getItem(API_KEY)||adminApi||'').replace(/\/$/,'');
+const api=(localStorage.getItem(API_KEY)||adminApi||DEFAULT_API).replace(/\/$/,'');
 window.ATAS_CONTENT_MODE='static';
 window.ATAS_API_BASE=api;
 
