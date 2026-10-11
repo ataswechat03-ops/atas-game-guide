@@ -50,7 +50,31 @@ CREATE TABLE IF NOT EXISTS settings (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS trash (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  original_id INTEGER,
+  type TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  title TEXT NOT NULL,
+  category TEXT DEFAULT '',
+  body TEXT NOT NULL DEFAULT '{}',
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  published INTEGER NOT NULL DEFAULT 1,
+  deleted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS audit_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  action TEXT NOT NULL,
+  target_type TEXT DEFAULT '',
+  target_slug TEXT DEFAULT '',
+  details TEXT NOT NULL DEFAULT '{}',
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 `);
+
+function audit(action,targetType='',targetSlug='',details={}){
+  try{db.prepare('INSERT INTO audit_log(action,target_type,target_slug,details,created_at) VALUES(?,?,?,?,CURRENT_TIMESTAMP)').run(action,targetType,targetSlug,JSON.stringify(details||{}));}catch(e){console.error('Audit log failed:',e.message)}
+}
 
 function seedMissingFootballGuides(){
   const seedFile=path.resolve(process.cwd(),'seed-football-guides.json');
@@ -69,6 +93,7 @@ const adminHash=bcrypt.hashSync(ADMIN_PASSWORD,12);
 function auth(req,res,next){const h=req.headers.authorization||'';const token=h.startsWith('Bearer ')?h.slice(7):'';try{req.user=jwt.verify(token,JWT_SECRET);next()}catch{res.status(401).json({error:'未授權'})}}
 function safeParse(s){try{return JSON.parse(s)}catch{return {}}}
 function rowToJson(r){return {...r,body:safeParse(r.body),published:!!r.published}}
+function trashToJson(r){return {...r,body:safeParse(r.body),published:!!r.published}}
 
 app.get('/api/health',(req,res)=>res.json({ok:true,service:'ATAS Guide API',database:path.basename(DB_PATH)}));
 app.post('/api/login',(req,res)=>{const {username,password}=req.body||{};if(username!==ADMIN_USER||!bcrypt.compareSync(String(password||''),adminHash))return res.status(401).json({error:'帳號或密碼錯誤'});const token=jwt.sign({sub:ADMIN_USER,role:'admin'},JWT_SECRET,{expiresIn:'8h'});res.json({token,user:ADMIN_USER})});
@@ -81,16 +106,27 @@ app.post('/api/upload',auth,express.raw({type:'image/*',limit:'12mb'}),(req,res)
   fs.writeFileSync(path.join(UPLOAD_DIR,name),req.body);
   const proto=String(req.headers['x-forwarded-proto']||req.protocol||'https').split(',')[0].trim();
   const url=`${proto}://${req.get('host')}/uploads/${name}`;
+  audit('upload_image','image',name,{size:req.body.length});
   res.status(201).json({ok:true,url,name,size:req.body.length});
 });
 
 app.get('/api/public/content',(req,res)=>{const rows=db.prepare('SELECT * FROM content WHERE published=1 ORDER BY type,sort_order,id').all();res.json(rows.map(rowToJson))});
 app.get('/api/content',auth,(req,res)=>{const rows=db.prepare('SELECT * FROM content ORDER BY type,sort_order,id').all();res.json(rows.map(rowToJson))});
-app.post('/api/content',auth,(req,res)=>{const {type,slug,title,category='',body={},sort_order=0,published=true}=req.body||{};if(!['guide','case','quiz'].includes(type)||!slug||!title)return res.status(400).json({error:'欄位不完整'});try{const info=db.prepare('INSERT INTO content(type,slug,title,category,body,sort_order,published,updated_at) VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP)').run(type,slug,title,category,JSON.stringify(body),Number(sort_order)||0,published?1:0);res.status(201).json(rowToJson(db.prepare('SELECT * FROM content WHERE id=?').get(info.lastInsertRowid)))}catch(e){res.status(409).json({error:'slug 重複或資料格式錯誤'})}});
+app.post('/api/content',auth,(req,res)=>{const {type,slug,title,category='',body={},sort_order=0,published=true}=req.body||{};if(!['guide','case','quiz'].includes(type)||!slug||!title)return res.status(400).json({error:'欄位不完整'});try{const info=db.prepare('INSERT INTO content(type,slug,title,category,body,sort_order,published,updated_at) VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP)').run(type,slug,title,category,JSON.stringify(body),Number(sort_order)||0,published?1:0);audit('create',type,slug,{title});res.status(201).json(rowToJson(db.prepare('SELECT * FROM content WHERE id=?').get(info.lastInsertRowid)))}catch(e){res.status(409).json({error:'slug 重複或資料格式錯誤'})}});
 app.post('/api/content/bulk',auth,(req,res)=>{const items=Array.isArray(req.body?.items)?req.body.items:[];if(!items.length)return res.status(400).json({error:'沒有可匯入的資料'});const upsert=db.prepare(`INSERT INTO content(type,slug,title,category,body,sort_order,published,updated_at) VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP)
-ON CONFLICT(type,slug) DO UPDATE SET title=excluded.title,category=excluded.category,body=excluded.body,sort_order=excluded.sort_order,published=excluded.published,updated_at=CURRENT_TIMESTAMP`);const tx=db.transaction(list=>{let count=0;for(const x of list){if(!['guide','case','quiz'].includes(x.type)||!x.slug||!x.title)continue;upsert.run(x.type,String(x.slug),String(x.title),String(x.category||''),JSON.stringify(x.body||{}),Number(x.sort_order)||0,x.published===false?0:1);count++}return count});const count=tx(items);res.json({ok:true,count})});
-app.put('/api/content/:id',auth,(req,res)=>{const id=Number(req.params.id);const old=db.prepare('SELECT * FROM content WHERE id=?').get(id);if(!old)return res.status(404).json({error:'找不到資料'});const v={...old,...req.body};db.prepare('UPDATE content SET type=?,slug=?,title=?,category=?,body=?,sort_order=?,published=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(v.type,v.slug,v.title,v.category||'',JSON.stringify(v.body??safeParse(old.body)),Number(v.sort_order)||0,v.published?1:0,id);res.json(rowToJson(db.prepare('SELECT * FROM content WHERE id=?').get(id)))});
-app.delete('/api/content/:id',auth,(req,res)=>{db.prepare('DELETE FROM content WHERE id=?').run(Number(req.params.id));res.status(204).end()});
+ON CONFLICT(type,slug) DO UPDATE SET title=excluded.title,category=excluded.category,body=excluded.body,sort_order=excluded.sort_order,published=excluded.published,updated_at=CURRENT_TIMESTAMP`);const tx=db.transaction(list=>{let count=0;for(const x of list){if(!['guide','case','quiz'].includes(x.type)||!x.slug||!x.title)continue;upsert.run(x.type,String(x.slug),String(x.title),String(x.category||''),JSON.stringify(x.body||{}),Number(x.sort_order)||0,x.published===false?0:1);count++}return count});const count=tx(items);audit('bulk_sync','content','',{count});res.json({ok:true,count})});
+app.post('/api/content/bulk-state',auth,(req,res)=>{const ids=Array.isArray(req.body?.ids)?req.body.ids.map(Number).filter(Number.isFinite):[];const published=!!req.body?.published;if(!ids.length)return res.status(400).json({error:'沒有選取內容'});const q=`UPDATE content SET published=?,updated_at=CURRENT_TIMESTAMP WHERE id IN (${ids.map(()=>'?').join(',')})`;const info=db.prepare(q).run(published?1:0,...ids);audit(published?'bulk_publish':'bulk_draft','content','',{ids,count:info.changes});res.json({ok:true,count:info.changes})});
+app.put('/api/content/:id',auth,(req,res)=>{const id=Number(req.params.id);const old=db.prepare('SELECT * FROM content WHERE id=?').get(id);if(!old)return res.status(404).json({error:'找不到資料'});const v={...old,...req.body};db.prepare('UPDATE content SET type=?,slug=?,title=?,category=?,body=?,sort_order=?,published=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(v.type,v.slug,v.title,v.category||'',JSON.stringify(v.body??safeParse(old.body)),Number(v.sort_order)||0,v.published?1:0,id);audit('update',v.type,v.slug,{fields:Object.keys(req.body||{})});res.json(rowToJson(db.prepare('SELECT * FROM content WHERE id=?').get(id)))});
+app.delete('/api/content/:id',auth,(req,res)=>{const id=Number(req.params.id);const old=db.prepare('SELECT * FROM content WHERE id=?').get(id);if(!old)return res.status(404).json({error:'找不到資料'});const tx=db.transaction(()=>{db.prepare('INSERT INTO trash(original_id,type,slug,title,category,body,sort_order,published,deleted_at) VALUES(?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP)').run(old.id,old.type,old.slug,old.title,old.category||'',old.body,old.sort_order,old.published);db.prepare('DELETE FROM content WHERE id=?').run(id)});tx();audit('move_to_trash',old.type,old.slug,{title:old.title});res.status(204).end()});
+
+app.get('/api/trash',auth,(req,res)=>{const rows=db.prepare('SELECT * FROM trash ORDER BY deleted_at DESC,id DESC LIMIT 200').all();res.json(rows.map(trashToJson))});
+app.post('/api/trash/:id/restore',auth,(req,res)=>{const id=Number(req.params.id);const item=db.prepare('SELECT * FROM trash WHERE id=?').get(id);if(!item)return res.status(404).json({error:'找不到垃圾桶資料'});const tx=db.transaction(()=>{db.prepare(`INSERT INTO content(type,slug,title,category,body,sort_order,published,updated_at) VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP)
+ON CONFLICT(type,slug) DO UPDATE SET title=excluded.title,category=excluded.category,body=excluded.body,sort_order=excluded.sort_order,published=excluded.published,updated_at=CURRENT_TIMESTAMP`).run(item.type,item.slug,item.title,item.category||'',item.body,item.sort_order,item.published);db.prepare('DELETE FROM trash WHERE id=?').run(id)});tx();audit('restore',item.type,item.slug,{title:item.title});res.json({ok:true})});
+app.delete('/api/trash/:id',auth,(req,res)=>{const id=Number(req.params.id);const item=db.prepare('SELECT * FROM trash WHERE id=?').get(id);db.prepare('DELETE FROM trash WHERE id=?').run(id);if(item)audit('delete_permanently',item.type,item.slug,{title:item.title});res.status(204).end()});
+app.delete('/api/trash',auth,(req,res)=>{const info=db.prepare('DELETE FROM trash').run();audit('empty_trash','trash','',{count:info.changes});res.json({ok:true,count:info.changes})});
+
+app.get('/api/audit',auth,(req,res)=>{const limit=Math.min(Math.max(Number(req.query.limit)||100,1),300);const rows=db.prepare('SELECT * FROM audit_log ORDER BY id DESC LIMIT ?').all(limit).map(r=>({...r,details:safeParse(r.details)}));res.json(rows)});
+
 app.get('/api/settings',auth,(req,res)=>{const rows=db.prepare('SELECT key,value FROM settings').all();res.json(Object.fromEntries(rows.map(r=>[r.key,safeParse(r.value)])))});
 app.put('/api/settings/:key',auth,(req,res)=>{const value=JSON.stringify(req.body?.value??null);db.prepare('INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value').run(req.params.key,value);res.json({ok:true})});
 
