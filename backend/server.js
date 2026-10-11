@@ -1,4 +1,6 @@
 import 'dotenv/config';
+import fs from 'fs';
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
@@ -7,16 +9,26 @@ import Database from 'better-sqlite3';
 
 const app=express();
 const PORT=Number(process.env.PORT||3000);
-const JWT_SECRET=process.env.JWT_SECRET||'dev-only-change-me';
-const ADMIN_USER=process.env.ADMIN_USER||'admin';
-const ADMIN_PASSWORD=process.env.ADMIN_PASSWORD||'change-me';
-const CORS_ORIGIN=process.env.CORS_ORIGIN||'*';
+const IS_PROD=process.env.NODE_ENV==='production';
+const JWT_SECRET=process.env.JWT_SECRET||(!IS_PROD?'dev-only-change-me':'');
+const ADMIN_USER=process.env.ADMIN_USER||(!IS_PROD?'admin':'');
+const ADMIN_PASSWORD=process.env.ADMIN_PASSWORD||(!IS_PROD?'change-me':'');
+const CORS_ORIGIN=process.env.CORS_ORIGIN||(!IS_PROD?'*':'https://ataswechat03-ops.github.io');
+const DB_PATH=process.env.DB_PATH||path.resolve(process.cwd(),'atas-guide.db');
 
+if(!JWT_SECRET||!ADMIN_USER||!ADMIN_PASSWORD){
+  console.error('Missing required production environment variables: JWT_SECRET, ADMIN_USER, ADMIN_PASSWORD');
+  process.exit(1);
+}
+
+fs.mkdirSync(path.dirname(DB_PATH),{recursive:true});
+app.disable('x-powered-by');
 app.use(cors({origin:CORS_ORIGIN==='*'?true:CORS_ORIGIN.split(',').map(s=>s.trim())}));
 app.use(express.json({limit:'4mb'}));
 
-const db=new Database('atas-guide.db');
+const db=new Database(DB_PATH);
 db.pragma('journal_mode = WAL');
+db.pragma('foreign_keys = ON');
 db.exec(`
 CREATE TABLE IF NOT EXISTS content (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,12 +48,12 @@ CREATE TABLE IF NOT EXISTS settings (
 );
 `);
 
-const adminHash=bcrypt.hashSync(ADMIN_PASSWORD,10);
+const adminHash=bcrypt.hashSync(ADMIN_PASSWORD,12);
 function auth(req,res,next){const h=req.headers.authorization||'';const token=h.startsWith('Bearer ')?h.slice(7):'';try{req.user=jwt.verify(token,JWT_SECRET);next()}catch{res.status(401).json({error:'未授權'})}}
 function safeParse(s){try{return JSON.parse(s)}catch{return {}}}
 function rowToJson(r){return {...r,body:safeParse(r.body),published:!!r.published}}
 
-app.get('/api/health',(req,res)=>res.json({ok:true,service:'ATAS Guide API'}));
+app.get('/api/health',(req,res)=>res.json({ok:true,service:'ATAS Guide API',database:path.basename(DB_PATH)}));
 app.post('/api/login',(req,res)=>{const {username,password}=req.body||{};if(username!==ADMIN_USER||!bcrypt.compareSync(String(password||''),adminHash))return res.status(401).json({error:'帳號或密碼錯誤'});const token=jwt.sign({sub:ADMIN_USER,role:'admin'},JWT_SECRET,{expiresIn:'8h'});res.json({token,user:ADMIN_USER})});
 
 app.get('/api/public/content',(req,res)=>{const rows=db.prepare('SELECT * FROM content WHERE published=1 ORDER BY type,sort_order,id').all();res.json(rows.map(rowToJson))});
@@ -55,4 +67,4 @@ app.get('/api/settings',auth,(req,res)=>{const rows=db.prepare('SELECT key,value
 app.put('/api/settings/:key',auth,(req,res)=>{const value=JSON.stringify(req.body?.value??null);db.prepare('INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value').run(req.params.key,value);res.json({ok:true})});
 
 app.use((err,req,res,next)=>{console.error(err);res.status(500).json({error:'伺服器錯誤'})});
-app.listen(PORT,()=>console.log(`ATAS Guide API running on :${PORT}`));
+app.listen(PORT,'0.0.0.0',()=>console.log(`ATAS Guide API running on :${PORT} using ${DB_PATH}`));
