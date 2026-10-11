@@ -40,12 +40,12 @@
   `;
   document.head.appendChild(style);
 
-  const coverUrl=file=>String(file??'').split('/').map(encodeURIComponent).join('/');
+  const coverUrl=file=>{const s=String(file??'');return /^https?:\/\//i.test(s)?s:s.split('/').map(encodeURIComponent).join('/')};
 
   function coverHtml(g){
-    const file=COVER_IMAGES[g.id];
+    const file=g.cover||COVER_IMAGES[g.id];
     if(!file)return `<span class="emoji">${g.emoji}</span>`;
-    return `<img loading="lazy" decoding="async" src="${coverUrl(file)}?v=stable-cover-20261010e" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`;
+    return `<img loading="lazy" decoding="async" src="${coverUrl(file)}${g.cover?'':'?v=stable-cover-20261010e'}" alt="${esc(g.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="emoji" style="display:none">${g.emoji}</span>`;
   }
 
   renderCards=function(){
