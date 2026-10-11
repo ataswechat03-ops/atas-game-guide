@@ -48,6 +48,19 @@ CREATE TABLE IF NOT EXISTS settings (
 );
 `);
 
+function seedMissingFootballGuides(){
+  const seedFile=path.resolve(process.cwd(),'seed-football-guides.json');
+  if(!fs.existsSync(seedFile))return;
+  try{
+    const items=JSON.parse(fs.readFileSync(seedFile,'utf8'));
+    const insert=db.prepare('INSERT OR IGNORE INTO content(type,slug,title,category,body,sort_order,published,updated_at) VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP)');
+    const tx=db.transaction(list=>{let count=0;for(const x of list){const r=insert.run(x.type,x.slug,x.title,x.category||'',JSON.stringify(x.body||{}),Number(x.sort_order)||0,x.published===false?0:1);count+=r.changes}return count});
+    const count=tx(Array.isArray(items)?items:[]);
+    if(count)console.log(`Seeded ${count} missing football guide(s)`);
+  }catch(e){console.error('Football guide seed failed:',e.message)}
+}
+seedMissingFootballGuides();
+
 const adminHash=bcrypt.hashSync(ADMIN_PASSWORD,12);
 function auth(req,res,next){const h=req.headers.authorization||'';const token=h.startsWith('Bearer ')?h.slice(7):'';try{req.user=jwt.verify(token,JWT_SECRET);next()}catch{res.status(401).json({error:'未授權'})}}
 function safeParse(s){try{return JSON.parse(s)}catch{return {}}}
