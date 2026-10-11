@@ -70,8 +70,11 @@
   </section>
 
   <section id="quizEditor" class="visual-editor" hidden>
-    <div class="editor-grid"><label class="full">測驗資料 JSON<textarea id="quizBody" rows="14">{}</textarea></label></div>
-    <div class="editor-hint">測驗目前仍保留進階格式；教學與案例已可完全用表單編輯。</div>
+    <div class="editor-grid"><label class="full">測驗說明<textarea id="quizIntro" rows="3" placeholder="例如：完成教學後，用這份測驗確認是否理解盤口與計算方式。"></textarea></label></div>
+    <div class="section-toolbar"><div><b>測驗題目</b><small>每題可設定 2～6 個選項、正確答案與答題解說。</small></div><button id="addQuizQuestion" type="button">＋ 新增題目</button></div>
+    <div id="quizQuestions"></div>
+    <textarea id="quizBody" hidden>{}</textarea>
+    <div class="editor-hint">測驗資料仍使用原本 JSON 格式儲存，但現在可直接用表單編輯，不需要手動修改 JSON。</div>
   </section>
 
   <details class="advanced-json"><summary>進階 JSON（特殊內容才需要）</summary><textarea id="edBody" rows="12">{}</textarea></details>
@@ -97,6 +100,7 @@
 <script src="football-guides-data.js?v=20261011a"></script>
 <script src="bet-cases.js?v=20261011b"></script>
 <script src="admin.js?v=20261011e"></script>
+<script src="admin-quiz.js?v=20261011a"></script>
 <script src="admin-media.js?v=20261011a"></script>
 <script src="admin-pro.js?v=20261011a"></script>
 <script src="admin-workflow.js?v=20261011a"></script>
