@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ATAS 教學後台</title>
-<link rel="stylesheet" href="admin.css?v=20261011a">
+<link rel="stylesheet" href="admin.css?v=20261011d">
 </head>
 <body>
 <div class="admin-shell">
@@ -19,29 +19,77 @@
     <header><div><small>ATAS CONTENT MANAGER</small><h1>內容管理後台</h1></div><div class="api-state" id="apiState">尚未連線</div></header>
 
     <section id="loginPanel" class="panel login-panel">
-      <h2>後台登入</h2><p>請連接已部署的 ATAS Guide API。GitHub Pages 本身不能執行伺服器端資料庫。</p>
-      <label>API 網址<input id="apiBase" placeholder="例如 https://api.example.com/api"></label>
+      <h2>後台登入</h2><p>API 已預設連接 Railway，輸入管理員帳號與密碼即可。</p>
+      <label>API 網址<input id="apiBase" placeholder="https://.../api"></label>
       <div class="two"><label>管理員帳號<input id="adminUser" autocomplete="username"></label><label>密碼<input id="adminPass" type="password" autocomplete="current-password"></label></div>
       <button id="loginBtn" class="primary">登入</button><div id="loginMsg" class="msg"></div>
     </section>
 
     <section id="appPanel" hidden>
       <div class="stats" id="stats"></div>
-      <div class="toolbar"><select id="typeFilter"><option value="">全部類型</option><option value="guide">教學</option><option value="case">案例</option><option value="quiz">測驗</option></select><input id="searchAdmin" placeholder="搜尋標題 / slug / 分類"><button id="importLegacyBtn">匯入目前前台資料</button><button id="newBtn" class="primary">＋ 新增內容</button></div>
+      <div class="toolbar"><select id="typeFilter"><option value="">全部類型</option><option value="guide">教學</option><option value="case">案例</option><option value="quiz">測驗</option></select><input id="searchAdmin" placeholder="搜尋標題 / slug / 分類"><button id="importLegacyBtn">同步前台教學</button><button id="newBtn" class="primary">＋ 新增內容</button></div>
       <div id="importMsg" class="msg"></div>
       <section class="panel"><div class="table-wrap"><table><thead><tr><th>類型</th><th>標題</th><th>分類</th><th>狀態</th><th>排序</th><th></th></tr></thead><tbody id="contentRows"></tbody></table></div></section>
     </section>
   </main>
 </div>
 
-<div class="modal" id="editorModal" hidden><div class="modal-card"><div class="modal-head"><h2 id="editorTitle">新增內容</h2><button id="closeEditor">×</button></div><div class="editor-grid">
-<label>類型<select id="edType"><option value="guide">教學</option><option value="case">案例</option><option value="quiz">測驗</option></select></label>
-<label>Slug<input id="edSlug" placeholder="例如 football-basic"></label>
-<label>標題<input id="edTitle"></label><label>分類<input id="edCategory"></label>
-<label>排序<input id="edSort" type="number" value="0"></label><label class="check"><input id="edPublished" type="checkbox" checked> 已發布</label>
-<label class="full">內容 JSON<textarea id="edBody" rows="12">{}</textarea></label>
-</div><div class="modal-actions"><button id="deleteBtn" class="danger">刪除</button><button id="saveBtn" class="primary">儲存</button></div><div id="editorMsg" class="msg"></div></div></div>
+<div class="modal" id="editorModal" hidden><div class="modal-card wide-modal">
+  <div class="modal-head"><div><small id="editorKicker">CONTENT EDITOR</small><h2 id="editorTitle">新增內容</h2></div><button id="closeEditor">×</button></div>
+  <div class="editor-grid">
+    <label>類型<select id="edType"><option value="guide">教學</option><option value="case">案例</option><option value="quiz">測驗</option></select></label>
+    <label>Slug<input id="edSlug" placeholder="例如 football-basic"></label>
+    <label>標題<input id="edTitle"></label><label>分類<input id="edCategory" placeholder="例如 體育"></label>
+    <label>排序<input id="edSort" type="number" value="0"></label><label class="check"><input id="edPublished" type="checkbox" checked> 已發布</label>
+  </div>
+
+  <section id="guideEditor" class="visual-editor">
+    <div class="editor-grid">
+      <label>圖示 / Emoji<input id="edEmoji" placeholder="⚽"></label>
+      <label>標籤<input id="edTags" placeholder="足球, 讓分, 大小盤"></label>
+      <label class="full">簡介<textarea id="edIntro" rows="3" placeholder="這篇教學的簡短介紹"></textarea></label>
+    </div>
+    <div class="section-toolbar"><div><b>教學章節</b><small>直接新增、刪除、排序，不用改 JSON。</small></div><button id="addSectionBtn" type="button">＋ 新增章節</button></div>
+    <div id="sectionsEditor"></div>
+  </section>
+
+  <section id="caseEditor" class="visual-editor" hidden>
+    <div class="editor-grid">
+      <label>狀態標籤<input id="caseTag" placeholder="已結算"></label><label>結算結果<input id="caseSettlement" placeholder="輸半"></label>
+      <label class="full">賽事<input id="caseMatch"></label><label class="full">投注內容<input id="caseMarket"></label>
+      <label>比賽結果<input id="caseResult"></label><label>基準額<input id="caseBase" type="number" step="any"></label>
+      <label>實際押注<input id="caseRisk" type="number" step="any"></label><label>損益<input id="casePnl" type="number" step="any"></label>
+      <label class="full">計算說明<textarea id="caseExplain" rows="4"></textarea></label>
+      <label class="full">公式<textarea id="caseFormula" rows="2"></textarea></label>
+    </div>
+  </section>
+
+  <section id="quizEditor" class="visual-editor" hidden>
+    <div class="editor-grid"><label class="full">測驗資料 JSON<textarea id="quizBody" rows="14">{}</textarea></label></div>
+    <div class="editor-hint">測驗目前仍保留進階格式；教學與案例已可完全用表單編輯。</div>
+  </section>
+
+  <details class="advanced-json"><summary>進階 JSON（特殊內容才需要）</summary><textarea id="edBody" rows="12">{}</textarea></details>
+  <div class="modal-actions"><button id="deleteBtn" class="danger">刪除</button><button id="saveBtn" class="primary">儲存</button></div><div id="editorMsg" class="msg"></div>
+</div></div>
+
+<template id="sectionTemplate">
+  <article class="section-editor-card">
+    <div class="section-card-head"><b>章節</b><div><button type="button" data-move="up">↑</button><button type="button" data-move="down">↓</button><button type="button" data-remove>刪除</button></div></div>
+    <label>章節標題<input data-sec="title" placeholder="例如 01｜基本玩法"></label>
+    <label>重點卡片 <small>每一組包含「小標題＋內容」</small></label>
+    <div data-boxes></div><button type="button" class="sub-add" data-add-box>＋ 新增重點卡片</button>
+    <label>清單 <small>每行一項</small><textarea data-sec="list" rows="4"></textarea></label>
+    <label>表格欄位 <small>用 | 分隔，例如：玩法 | 判定</small><input data-sec="tableHeaders"></label>
+    <label>表格內容 <small>每行一列，用 | 分隔</small><textarea data-sec="tableRows" rows="4"></textarea></label>
+    <label>圖片</label><div data-images></div><button type="button" class="sub-add" data-add-image>＋ 新增圖片</button>
+    <label>提醒 / 備註<textarea data-sec="note" rows="3"></textarea></label>
+    <label class="check inline-check"><input data-sec="footballImages" type="checkbox"> 插入足球盤口圖解</label>
+  </article>
+</template>
+
 <script src="guides.js?v=20261010c"></script>
+<script src="football-guides-data.js?v=20261011a"></script>
 <script src="bet-cases.js?v=20261011b"></script>
 <script src="admin.js?v=20261011d"></script>
 </body></html>
