@@ -24,9 +24,35 @@ function normalizeGuide(r){
   };
 }
 
+function mergeGuideWithLocal(apiGuide,localGuide){
+  if(!localGuide)return apiGuide;
+  const apiHasSections=Array.isArray(apiGuide.sections)&&apiGuide.sections.length>0;
+  const apiHasSteps=Array.isArray(apiGuide.steps)&&apiGuide.steps.length>0;
+  const localHasSections=Array.isArray(localGuide.sections)&&localGuide.sections.length>0;
+  const localHasSteps=Array.isArray(localGuide.steps)&&localGuide.steps.length>0;
+
+  // 防止後台舊資料／不完整資料把既有完整教學內容覆蓋成空白。
+  // API 有實際內容時仍以 API 為準；只有 API 為空而本機有內容時才回退。
+  return {
+    ...localGuide,
+    ...apiGuide,
+    sections:apiHasSections?apiGuide.sections:(localHasSections?localGuide.sections:apiGuide.sections),
+    steps:apiHasSteps?apiGuide.steps:(localHasSteps?localGuide.steps:apiGuide.steps),
+    tags:Array.isArray(apiGuide.tags)&&apiGuide.tags.length?apiGuide.tags:(Array.isArray(localGuide.tags)?localGuide.tags:[]),
+    intro:apiGuide.intro||localGuide.intro||'',
+    cover:apiGuide.cover||localGuide.cover||'',
+    emoji:apiGuide.emoji&&apiGuide.emoji!=='📘'?apiGuide.emoji:(localGuide.emoji||apiGuide.emoji||'📘')
+  };
+}
+
 function applyGuides(rows){
   if(typeof GUIDES==='undefined'||!Array.isArray(GUIDES))return false;
-  const apiGuides=rows.filter(r=>r.type==='guide').map(normalizeGuide).filter(g=>g.id&&g.title);
+  const localById=new Map(GUIDES.filter(g=>g?.id).map(g=>[g.id,g]));
+  const apiGuides=rows
+    .filter(r=>r.type==='guide')
+    .map(normalizeGuide)
+    .filter(g=>g.id&&g.title)
+    .map(g=>mergeGuideWithLocal(g,localById.get(g.id)));
   if(!apiGuides.length)return false;
   const apiIds=new Set(apiGuides.map(g=>g.id));
   const localOnly=GUIDES.filter(g=>g?.id&&!apiIds.has(g.id));
