@@ -1,0 +1,81 @@
+/* ATAS frontend readability pass */
+:root{--readable-muted:#6f7782;--readable-muted-dark:#a9bacb}
+
+/* Global readable minimums for content that users actually need to read */
+body{font-size:15px;line-height:1.55}
+
+/* Sidebar */
+#categoryNav button{font-size:15px!important;line-height:1.35!important}
+#guideNav button{font-size:14px!important;line-height:1.38!important}
+#categoryNav .count,#guideNav small,#guideNav span{font-size:12.5px!important;line-height:1.4!important}
+.side-title{font-size:12.5px!important;letter-spacing:.08em!important}
+#quickCollapseBtn{font-size:13px!important}
+
+/* Learning route / training panels */
+.route-step,.training-panel,.learn-panel{font-size:14px!important}
+.route-step b,.route-step strong,.training-panel h3,.learn-panel h3{font-size:16px!important;line-height:1.45!important}
+.route-step small,.route-step span,.training-panel p,.learn-panel p,.training-panel .muted,.learn-panel .muted{font-size:13px!important;line-height:1.55!important}
+.route-state{font-size:12.5px!important}
+
+/* Sports / football calculators and common tools */
+.std-odds,.odds-v2,.parlay-tool,.workspace-section,.sports-tool,.tool-card{font-size:14px!important}
+.std-odds label,.odds-v2 label,.parlay-tool label,.workspace-section label,.field-label,.tool-label{font-size:13.5px!important;font-weight:600!important;line-height:1.4!important}
+.std-odds input,.std-odds select,.odds-v2 input,.odds-v2 select,.parlay-tool input,.parlay-tool select,.workspace-section input,.workspace-section select,.workspace-section textarea{font-size:15px!important;line-height:1.4!important;min-height:44px!important}
+.std-odds input::placeholder,.odds-v2 input::placeholder,.parlay-tool input::placeholder,.workspace-section input::placeholder{font-size:15px!important;opacity:.78!important}
+.std-odds button,.odds-v2 button,.parlay-tool button,.workspace-section button,.training-panel button,.learn-panel button{font-size:13.5px!important;line-height:1.35!important}
+.std-odds .result,.std-odds .value,.odds-v2 .result,.odds-v2 .value,.parlay-tool .result,.workspace-section .result{font-size:18px!important;font-weight:800!important}
+.std-odds .result small,.std-odds .label,.odds-v2 .result small,.odds-v2 .label,.parlay-tool .result small,.workspace-section .result small{font-size:13px!important;line-height:1.4!important}
+
+/* Quick-tool tags and helper text */
+.tool-tag,.pill,.learn-chip,.badge,.cert-btn,.v3-meta,.mini-status{font-size:12.5px!important;line-height:1.35!important}
+.tool-note,.tool-desc,.helper-text,.hint,.note,.muted,.small-text{font-size:13px!important;line-height:1.55!important}
+
+/* Cards */
+.card-body h3,.guide-card h3{font-size:18px!important;line-height:1.4!important}
+.card-body p,.guide-card p,.card-meta{font-size:13.5px!important;line-height:1.55!important}
+.card-footer,.card-footer b{font-size:13px!important}
+.learn-chip{padding-top:5px!important;padding-bottom:5px!important}
+
+/* Toolbar / search */
+.search input{font-size:15px!important}
+.search input::placeholder{font-size:14px!important}
+.count{font-size:13px!important}
+.toolbar select,.toolbar button{font-size:13.5px!important}
+
+/* Detail page */
+.detail-head p{font-size:14.5px!important;line-height:1.65!important}
+.detail-body{font-size:15px!important;line-height:1.7!important}
+.detail-body p,.detail-body li{font-size:15px!important;line-height:1.7!important}
+.detail-body small,.detail-body .muted,.lesson-section small{font-size:13px!important;line-height:1.55!important}
+.detail-learn-tools button{font-size:13px!important}
+.lesson-section>h3{font-size:21px!important}
+.lesson-box,.lesson-note,.quick-summary,.learner-progress-card{font-size:14px!important;line-height:1.6!important}
+.lesson-nav button{font-size:14px!important}
+
+/* Certification / practice / wrong-answer areas */
+.cert-card h4,.route-track h4,.learning-lab h3{font-size:16px!important}
+.cert-card p,.route-cat>b,.route-node span,.route-node b,.learning-lab p{font-size:13px!important;line-height:1.5!important}
+.cert-score{font-size:25px!important}
+.exam-q strong{font-size:14px!important;line-height:1.5!important}
+.exam-opts label{font-size:14px!important;line-height:1.5!important}
+
+/* Light theme readability */
+body:not(.dark) .muted,
+body:not(.dark) .card-meta,
+body:not(.dark) .route-step small,
+body:not(.dark) .training-panel p,
+body:not(.dark) .learn-panel p{color:var(--readable-muted)!important}
+
+/* Existing dark tool panels embedded inside the light ATAS theme */
+.training-panel,.learn-panel,.workspace-section,.std-odds,.odds-v2,.parlay-tool{--local-muted:var(--readable-muted-dark)}
+.training-panel p,.training-panel small,.learn-panel p,.learn-panel small,.workspace-section p,.workspace-section small,.std-odds small,.odds-v2 small,.parlay-tool small{color:var(--local-muted)!important}
+
+@media(max-width:760px){
+  body{font-size:16px}
+  #categoryNav button{font-size:16px!important}
+  #guideNav button{font-size:15px!important}
+  input,select,textarea{font-size:16px!important}
+  button{font-size:14px}
+  .detail-body,.detail-body p,.detail-body li{font-size:16px!important}
+  .route-step small,.route-step span,.training-panel p,.learn-panel p,.card-body p,.guide-card p{font-size:14px!important}
+}
