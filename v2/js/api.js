@@ -25,6 +25,7 @@ async function loadGuides(){const rows=await request('/public/content');if(!Arra
 async function learnerLogin(username,password){const r=await request('/learner/login',{method:'POST',body:JSON.stringify({username,password})});setToken(r.token);return r}
 async function learnerMe(){return learnerRequest('/learner/me')}
 async function saveProgress(guide_slug,category,completed=false){return learnerRequest('/learner/progress',{method:'POST',body:JSON.stringify({guide_slug,category,completed})})}
+async function saveExam(category,score){return learnerRequest('/learner/exams',{method:'POST',body:JSON.stringify({category,score})})}
 function learnerLogout(){setToken('')}
-window.ATAS_V2_API={BASE,request,loadGuides,token,setToken,learnerLogin,learnerMe,saveProgress,learnerLogout};
+window.ATAS_V2_API={BASE,request,loadGuides,token,setToken,learnerLogin,learnerMe,saveProgress,saveExam,learnerLogout};
 })();
