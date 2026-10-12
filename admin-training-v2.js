@@ -16,3 +16,12 @@ function scheduleRefresh(delay=300){clearTimeout(refreshTimer);refreshTimer=setT
 function boot(){ensureModal();const panel=$('#trainingPanel');if(!panel)return;const rows=$('#trainingRows');if(rows)new MutationObserver(()=>wireRows()).observe(rows,{childList:true,subtree:false});document.addEventListener('click',e=>{if(e.target.closest('#trainingViewBtn'))scheduleRefresh(250);else if(e.target.closest('#trainingRefresh,#createLearner,[data-toggle],[data-reset]'))scheduleRefresh(500)});if(!panel.hidden)scheduleRefresh(600)}
 document.readyState==='loading'?document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,350)):setTimeout(boot,350);
 })();
+
+(()=>{
+  if(document.querySelector('script[data-admin-v4]'))return;
+  const s=document.createElement('script');
+  s.src='admin-v4.js?v=20261012b';
+  s.dataset.adminV4='1';
+  s.defer=true;
+  document.body.appendChild(s);
+})();
