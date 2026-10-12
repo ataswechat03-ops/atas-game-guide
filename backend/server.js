@@ -7,6 +7,7 @@ import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import Database from 'better-sqlite3';
+import {installTrainingApi} from './training-api.js';
 
 const app=express();
 const PORT=Number(process.env.PORT||3000);
@@ -129,6 +130,8 @@ app.get('/api/audit',auth,(req,res)=>{const limit=Math.min(Math.max(Number(req.q
 
 app.get('/api/settings',auth,(req,res)=>{const rows=db.prepare('SELECT key,value FROM settings').all();res.json(Object.fromEntries(rows.map(r=>[r.key,safeParse(r.value)])))});
 app.put('/api/settings/:key',auth,(req,res)=>{const value=JSON.stringify(req.body?.value??null);db.prepare('INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value').run(req.params.key,value);res.json({ok:true})});
+
+installTrainingApi({app,db,auth,JWT_SECRET,audit});
 
 app.use((err,req,res,next)=>{
   console.error(err);
