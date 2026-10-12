@@ -1,0 +1,1 @@
+.overlay{z-index:210!important}.detail{z-index:220!important}.detail.show{z-index:220!important}.detail-head{z-index:225!important}.detail .close,#closeDetail{position:relative!important;z-index:230!important;pointer-events:auto!important;cursor:pointer!important}.detail,.detail-head,#closeDetail{isolation:isolate}
