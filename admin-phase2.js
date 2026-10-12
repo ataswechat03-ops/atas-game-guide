@@ -1,5 +1,6 @@
 (()=>{
 'use strict';
+if(!document.querySelector('link[data-atas-admin-ui-refresh]')){const l=document.createElement('link');l.rel='stylesheet';l.href='admin-ui-refresh.css?v=20261012a';l.dataset.atasAdminUiRefresh='1';document.head.appendChild(l)}
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const API=()=>($('#apiBase')?.value.trim()||localStorage.getItem('atas-admin-api')||'https://atas-game-guide-api-production.up.railway.app/api').replace(/\/$/,'');
 const TOKEN=()=>sessionStorage.getItem('atas-admin-token')||'';

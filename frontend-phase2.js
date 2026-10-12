@@ -1,5 +1,6 @@
 (()=>{
 'use strict';
+if(!document.querySelector('link[data-atas-ui-refresh]')){const l=document.createElement('link');l.rel='stylesheet';l.href='ui-refresh.css?v=20261012a';l.dataset.atasUiRefresh='1';document.head.appendChild(l)}
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let activeProvider='全部館別';
 function guides(){return typeof GUIDES!=='undefined'&&Array.isArray(GUIDES)?GUIDES:[]}
