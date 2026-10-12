@@ -78,13 +78,21 @@ async function loadDriveImagesFromZip(){
   return driveZipPromise;
 }
 
-function categories(){return ['全部','電子遊戲','真人遊戲','體育'];}
+const CATEGORY_ORDER=['電子遊戲','真人遊戲','體育','棋牌','彩票','競速','平台操作','充值教學'];
+function categories(){
+  const found=[...new Set(GUIDES.map(g=>String(g.category||'').trim()).filter(Boolean))];
+  const ordered=CATEGORY_ORDER.filter(c=>found.includes(c));
+  const extra=found.filter(c=>!CATEGORY_ORDER.includes(c)).sort((a,b)=>a.localeCompare(b,'zh-Hant'));
+  return ['全部',...ordered,...extra];
+}
 function visibleGuides(){
   const q=query.trim().toLowerCase();
   return GUIDES.filter(g=>(activeCategory==='全部'||g.category===activeCategory) && (!q||[g.title,g.category,g.intro,...g.tags].join(' ').toLowerCase().includes(q)));
 }
 function renderNav(){
-  $('#categoryNav').innerHTML=categories().map(c=>`<button class="side-btn ${c===activeCategory?'active':''}" data-cat="${esc(c)}">${esc(c)}<span class="n">${c==='全部'?GUIDES.length:GUIDES.filter(g=>g.category===c).length}</span></button>`).join('');
+  const cats=categories();
+  if(!cats.includes(activeCategory))activeCategory='全部';
+  $('#categoryNav').innerHTML=cats.map(c=>`<button class="side-btn ${c===activeCategory?'active':''}" data-cat="${esc(c)}">${esc(c)}<span class="n">${c==='全部'?GUIDES.length:GUIDES.filter(g=>g.category===c).length}</span></button>`).join('');
   document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{activeCategory=b.dataset.cat;renderAll();closeSidebar();});
   $('#guideNav').innerHTML=GUIDES.map(g=>`<button class="side-btn" data-guide="${g.id}">${g.emoji} ${esc(g.title)}</button>`).join('');
   document.querySelectorAll('[data-guide]').forEach(b=>b.onclick=()=>{openGuide(b.dataset.guide);closeSidebar();});
@@ -113,7 +121,8 @@ function renderStats(){
   const sectionCount=GUIDES.reduce((n,g)=>n+g.sections.length,0);
   const driveCount=Object.values(DRIVE_IMAGES).reduce((n,arr)=>n+arr.length,0);
   const customCount=Object.values(CUSTOM_IMAGES).reduce((n,arr)=>n+arr.length,0);
-  $('#heroStats').innerHTML=`<div class="stat"><b>${GUIDES.length}</b><span>教學主題</span></div><div class="stat"><b>${sectionCount}</b><span>教學章節</span></div><div class="stat"><b>${driveCount+customCount+7}</b><span>教學圖片</span></div><div class="stat"><b>3</b><span>主要分類</span></div>`;
+  const categoryCount=Math.max(0,categories().length-1);
+  $('#heroStats').innerHTML=`<div class="stat"><b>${GUIDES.length}</b><span>教學主題</span></div><div class="stat"><b>${sectionCount}</b><span>教學章節</span></div><div class="stat"><b>${driveCount+customCount+7}</b><span>教學圖片</span></div><div class="stat"><b>${categoryCount}</b><span>主要分類</span></div>`;
 }
 function renderAll(){renderNav();renderCards();renderStats();}
 function imageGrid(imgs){
