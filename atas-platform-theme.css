@@ -1,0 +1,122 @@
+:root{
+  --atas-red:#ef3b36;
+  --atas-red-dark:#d92f2b;
+  --atas-red-soft:#fff1f0;
+  --atas-bg:#f5f6f8;
+  --atas-panel:#ffffff;
+  --atas-panel-2:#fafafa;
+  --atas-line:#e6e8ec;
+  --atas-text:#222831;
+  --atas-muted:#7d8794;
+  --atas-orange:#ff8a42;
+  --atas-gold:#f2b94b;
+  --atas-green:#36b983;
+  --atas-shadow:0 12px 30px rgba(36,45,58,.08);
+}
+html,body{background:var(--atas-bg)!important;color:var(--atas-text)!important}
+body{font-family:Inter,"Noto Sans TC",system-ui,sans-serif!important}
+.app{background:var(--atas-bg)!important}
+#sidebar{background:#fff!important;border-right:1px solid #e8eaee!important;box-shadow:6px 0 22px rgba(31,40,55,.04)!important}
+.brand{border-bottom:1px solid #eceef1!important;padding-bottom:18px!important}
+.brand .logo{background:linear-gradient(145deg,#ff5852,#e8302b)!important;color:#fff!important;box-shadow:0 8px 18px rgba(239,59,54,.24)!important}
+.brand b{color:#252b33!important}
+.brand small,.side-title{color:#9ca3ad!important}
+#categoryNav button,#guideNav button{color:#343b44!important;background:transparent!important;border-color:transparent!important}
+#categoryNav button:hover,#guideNav button:hover{background:#fff5f4!important;border-color:#ffd4d0!important;color:var(--atas-red)!important}
+#categoryNav button.active{background:linear-gradient(90deg,#fff1f0,#fff8f7)!important;border-color:#ffc8c3!important;color:var(--atas-red)!important;box-shadow:inset 3px 0 0 var(--atas-red)!important}
+#categoryNav .count,#guideNav small{color:#a8afb8!important}
+.quick-nav-collapsible{background:#fff!important}
+#quickCollapseBtn{background:#fafafa!important;border-color:#e6e8ec!important;color:#5e6670!important}
+main{background:linear-gradient(180deg,#f7f7f8 0,#f3f4f6 100%)!important}
+main>header{background:linear-gradient(90deg,var(--atas-red),#ed3b36)!important;border:none!important;border-radius:0!important;box-shadow:0 3px 14px rgba(190,40,34,.18)!important;padding:0 24px!important;min-height:58px!important;margin:0!important;position:sticky!important;top:0!important;z-index:80!important}
+main>header:after{display:none!important}
+.header-left{display:flex!important;align-items:center!important;min-height:58px!important;width:100%!important}
+.header-left>div>div.subhead{display:none!important}
+.header-left h1{color:#fff!important;font-size:18px!important;margin:0!important;white-space:nowrap!important}
+.menu-btn{color:#fff!important;background:rgba(255,255,255,.12)!important;border-color:rgba(255,255,255,.28)!important}
+.top-product-nav{background:transparent!important;border:0!important;margin-left:22px!important;padding:0!important}
+.top-product-nav button{color:#fff!important;opacity:.88!important;background:transparent!important;border-radius:0!important;min-height:58px!important;padding:0 14px!important;position:relative!important}
+.top-product-nav button:hover,.top-product-nav button.active{background:rgba(255,255,255,.08)!important;color:#fff!important;opacity:1!important}
+.top-product-nav button.active:after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:#fff}
+.learner-btn{background:#fff!important;color:var(--atas-red)!important;border-color:#fff!important;box-shadow:none!important}
+.learner-btn.on{background:#fff7e7!important;color:#c17d00!important;border-color:#ffe1a2!important}
+.hero{background:linear-gradient(110deg,#fff7f1 0,#ffe3da 34%,#f7b77b 72%,#ef5a49 100%)!important;border:1px solid #f2d4cc!important;border-radius:16px!important;box-shadow:var(--atas-shadow)!important;min-height:230px!important;overflow:hidden!important;position:relative!important}
+.hero:before{content:""!important;position:absolute!important;inset:auto -70px -120px auto!important;width:360px!important;height:360px!important;border-radius:50%!important;background:radial-gradient(circle,#ffd46d 0,#ffad6e 35%,transparent 72%)!important;opacity:.68!important;pointer-events:none!important}
+.hero:after{content:"ATAS TRAINING"!important;position:absolute!important;right:28px!important;bottom:-8px!important;font-size:64px!important;font-weight:900!important;color:rgba(255,255,255,.20)!important;letter-spacing:-.04em!important;pointer-events:none!important}
+.hero .pill{background:#fff!important;border-color:#f2c2ba!important;color:var(--atas-red)!important}
+.hero h2{color:#332728!important;text-shadow:none!important;font-size:clamp(30px,3.4vw,48px)!important}
+.hero p{color:#6f514d!important;max-width:720px!important}
+.hero-dashboard{background:rgba(255,255,255,.92)!important;border-color:#f1d0c8!important;box-shadow:0 18px 42px rgba(156,70,51,.12)!important}
+.hero-dashboard h3,.hero-mini-stat b{color:#2d3035!important}
+.hero-dashboard .mini-status,.hero-progress-meta,.hero-mini-stat span{color:#8d7a76!important}
+.hero-progress-line{background:#f0ebe8!important;border-color:#e6d7d2!important}
+.hero-progress-line span{background:linear-gradient(90deg,var(--atas-red),#ff8f5a)!important}
+.hero-mini-stat{background:#fff9f6!important;border-color:#f0ddd6!important}
+.learner-home,.learning-shelf,.learning-lab,.cert-center,.v3-home-card,.v3-category-card,.v3-provider-card{background:#fff!important;border-color:#e4e7eb!important;color:var(--atas-text)!important;box-shadow:0 8px 22px rgba(38,48,61,.05)!important}
+.learning-shelf-head h3,.v3-heading h2,.v3-category-card strong,.v3-provider-card b,.v3-home-card h3,.v3-continue-title{color:#262b31!important}
+.learning-mini,.v3-list button,.route-cat,.route-node,.cert-card{background:#fafafa!important;border-color:#e5e7eb!important;color:#2c3137!important}
+.learning-mini p,.v3-meta,.v3-list button span,.v3-category-card span,.v3-provider-card span{color:#89919b!important}
+.glossary-open,.learning-mini button,.v3-secondary{background:#fff!important;border-color:#e1e4e8!important;color:#4e5660!important}
+.v3-primary,.cert-btn.primary{background:var(--atas-red)!important;border-color:var(--atas-red)!important;color:#fff!important}
+.toolbar{background:#fff!important;border:1px solid #e3e5e8!important;box-shadow:0 8px 22px rgba(40,49,60,.05)!important;backdrop-filter:none!important}
+.search{background:#fff!important;border-color:#e3e5e8!important;box-shadow:none!important}
+.search:focus-within{border-color:#ef8d87!important;box-shadow:0 0 0 3px rgba(239,59,54,.08)!important}
+.search span,.search input{color:#4a515a!important}
+.search input::placeholder{color:#a8afb7!important}
+.count{background:#fff7f6!important;border-color:#ffd9d5!important;color:var(--atas-red)!important}
+.section-title .subhead{color:#c6c9ce!important}
+.section-title h2{color:#252a31!important}
+.section-title:after{color:#9ca3ad!important}
+.product-provider-strip,.v3-provider-board{gap:12px!important}
+.provider-tile{background:#fff!important;border-color:#e6e8eb!important;box-shadow:0 6px 18px rgba(36,44,55,.04)!important}
+.provider-tile b{color:#2c3137!important}
+.provider-tile span{color:#949ba4!important}
+.guide-grid{gap:16px!important}
+.guide-card{background:#fff!important;border:1px solid #e4e6ea!important;box-shadow:0 10px 24px rgba(35,43,54,.06)!important}
+.guide-card:hover{transform:translateY(-4px)!important;border-color:#f4b3ae!important;box-shadow:0 16px 34px rgba(132,62,54,.10)!important}
+.guide-card .cover{border-bottom:1px solid #f0f1f3!important}
+.card-body{background:#fff!important}
+.card-body h3{color:#252a31!important}
+.card-body p,.card-meta{color:#8f97a1!important}
+.learn-chip{background:#fff8f6!important;border-color:#ffd8d2!important;color:#a05d57!important}
+.learn-chip.easy{background:#f3fff8!important;border-color:#c7efd9!important;color:#269766!important}
+.learn-chip.mid{background:#f4f8ff!important;border-color:#cfddf5!important;color:#4d78b5!important}
+.learn-chip.hard{background:#fff9ed!important;border-color:#f2dfb5!important;color:#a3761f!important}
+.card-footer{background:#fafafa!important;border-top-color:#eceef0!important}
+.card-footer b{color:var(--atas-red)!important}
+.cert-zone-label h2,.cert-head h3,.route-track h4,.route-cat>b{color:#252a31!important}
+.cert-zone-label p,.cert-head p{color:#8e96a0!important}
+.cert-center{background:#fff!important}
+.cert-card.pass{background:#f4fff8!important;border-color:#bfe8d2!important}
+.cert-card p{color:#8b939d!important}
+.cert-score{color:#30353b!important}
+.cert-score.pass{color:#2caf75!important}
+.cert-btn{background:#fff!important;border-color:#e2e5e8!important;color:#505862!important}
+.learning-lab{background:#fff!important}
+.detail{background:#fff!important;color:#252a31!important}
+.detail-head{background:#fff!important;border-bottom-color:#eceef1!important}
+.detail-head h2,.detail-body h3,.lesson-section>h3{color:#242a31!important}
+.detail-head p,.detail-body,.lesson-section p{color:#606873!important}
+.detail-learn-tools{background:rgba(255,255,255,.96)!important;border-color:#e2e5e8!important}
+.detail-learn-tools button{background:#fff!important;border-color:#e2e5e8!important;color:#515963!important}
+.detail-learn-tools button.active{background:var(--atas-red)!important;border-color:var(--atas-red)!important;color:#fff!important}
+.lesson-box,.quick-summary,.learner-progress-card{background:#fff8f6!important;border-color:#f0d8d2!important;color:#333!important}
+.lesson-note{background:#fff9ee!important;border-color:#f4ddb4!important;color:#6d5b35!important}
+.lesson-nav button{background:#fff!important;border-color:#e3e6e9!important;color:#414851!important}
+.overlay{background:rgba(28,31,35,.45)!important}
+.learner-card{background:#fff!important;border-color:#eee1dd!important;color:#252a31!important;box-shadow:0 30px 90px rgba(51,38,35,.20)!important}
+.learner-card h2{color:#252a31!important}
+.learner-card input{background:#fafafa!important;color:#30353b!important;border-color:#e2e5e8!important}
+.frontend-mobile-nav{background:#fff!important;border-color:#e3e6e9!important;box-shadow:0 14px 36px rgba(30,38,48,.12)!important}
+.frontend-mobile-nav button{color:#8b929a!important}
+.frontend-mobile-nav button.active{background:#fff1f0!important;color:var(--atas-red)!important}
+@media(max-width:1250px){
+  .top-product-nav{background:transparent!important}
+}
+@media(max-width:760px){
+  #sidebar{background:#fff!important}
+  main>header{padding:0 12px!important}
+  .hero{margin-top:12px!important;padding:20px!important}
+  .hero:after{font-size:36px!important;right:12px!important;bottom:4px!important}
+  .hero h2{font-size:30px!important}
+}
