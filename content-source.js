@@ -13,30 +13,24 @@ function normalizeGuide(r){
     id:b.id||r.slug,
     title:b.title||r.title,
     category:b.category||r.category||'',
+    provider:b.provider||'',
     emoji:b.emoji||'📘',
     intro:b.intro||'',
     tags:Array.isArray(b.tags)?b.tags:[],
     cover:b.cover||'',
     sections:Array.isArray(b.sections)?b.sections:[],
+    steps:Array.isArray(b.steps)?b.steps:[],
     sort_order:Number(r.sort_order)||0
   };
 }
 
 function applyGuides(rows){
   if(typeof GUIDES==='undefined'||!Array.isArray(GUIDES))return false;
-
-  // /public/content 已依 sort_order 排序；前台直接採用 API 的順序。
-  const apiGuides=rows
-    .filter(r=>r.type==='guide')
-    .map(normalizeGuide)
-    .filter(g=>g.id&&g.title);
+  const apiGuides=rows.filter(r=>r.type==='guide').map(normalizeGuide).filter(g=>g.id&&g.title);
   if(!apiGuides.length)return false;
-
   const apiIds=new Set(apiGuides.map(g=>g.id));
-  // 尚未進後台的動態教學保留在最後，避免內容消失。
   const localOnly=GUIDES.filter(g=>g?.id&&!apiIds.has(g.id));
   GUIDES.splice(0,GUIDES.length,...apiGuides,...localOnly);
-
   try{typeof renderCards==='function'&&renderCards();}catch{}
   try{typeof renderNav==='function'&&renderNav();}catch{}
   try{typeof renderStats==='function'&&renderStats();}catch{}
