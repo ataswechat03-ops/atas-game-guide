@@ -1,0 +1,45 @@
+(()=>{
+'use strict';
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const WRONG_KEY='atas-v2-wrongbook';
+const EXAMS={
+'電子遊戲':[
+['RTP 通常指的是什麼？',['短期保證回報','長期理論回報率','每局固定獎金'],1],
+['Wild 最常見的作用是？',['代替部分一般圖案','直接結束遊戲','固定觸發 Jackpot'],0],
+['Scatter 常見用途是？',['觸發免費遊戲或額外獎勵','降低投注額','改變帳號餘額'],0],
+['WAYS 玩法主要依什麼形成獎勵？',['只看固定一條線','相鄰轉軸符合圖案','一定要三個 Scatter'],1],
+['高波動遊戲通常代表？',['中獎頻率與單次獎勵可能更極端','每局都會贏','RTP 一定更高'],0]],
+'真人遊戲':[
+['百家樂主要比較哪兩邊？',['莊與閒','紅與黑','大與小'],0],
+['百家樂點數超過 9 通常怎麼計？',['取個位數','直接算爆牌','全部歸零'],0],
+['百家樂「和」代表？',['雙方最終同點','莊一定贏','閒一定贏'],0],
+['骰寶常見使用幾顆骰子？',['2 顆','3 顆','5 顆'],1],
+['輪盤的 0 通常屬於？',['紅','黑','都不是'],2]],
+'體育':[
+['走水代表？',['本金退回','全輸','贏一半'],0],
+['讓球 -0.75 通常拆成？',['-0.5 與 -1.0','0 與 -0.5','-1.0 與 -1.5'],0],
+['歐洲盤 1.90、下注 100，全贏總返還？',['90','100','190'],2],
+['香港盤 0.90、下注 100，全贏淨利？',['90','100','190'],0],
+['美國盤 +120、下注 100，全贏淨利？',['100','120','220'],1]]};
+const PRACTICE=[
+{type:'實戰情境',q:'玩家下注足球讓球 -0.75，最後只贏半。應如何理解？',opts:['整注全贏','一半贏、一半走水','一半輸、一半走水'],a:1,ex:'-0.75 通常拆成 -0.5 與 -1.0，因此可能形成贏半。'},
+{type:'實戰情境',q:'百家樂最終莊 7 點、閒 7 點，判定是？',opts:['莊贏','閒贏','和局'],a:2,ex:'雙方最終點數相同就是和局。'},
+{type:'實戰情境',q:'電子遊戲中 Scatter 最常見的用途是？',opts:['觸發免費遊戲或額外獎勵','固定取代所有圖案','代表遊戲 RTP'],a:0,ex:'Scatter 通常用於觸發免費遊戲或特殊獎勵。'},
+{type:'客服判斷',q:'玩家說「走水是不是輸掉了？」最正確的說法是？',opts:['是，全部輸掉','不是，通常代表本金退回','代表贏一半'],a:1,ex:'走水通常指該注不計輸贏，本金退回。'},
+{type:'客服判斷',q:'玩家問 RTP 96% 是否代表每玩 100 元一定拿回 96 元？',opts:['是，每次都固定','不是，RTP 是長期理論回報率','只要連玩 100 次就一定'],a:1,ex:'RTP 是長期統計概念，不代表單次或短期結果。'}];
+function getWrong(){try{return JSON.parse(localStorage.getItem(WRONG_KEY)||'[]')}catch{return []}}
+function setWrong(v){localStorage.setItem(WRONG_KEY,JSON.stringify(v.slice(0,100)))}
+function addWrong(x){const list=getWrong(),i=list.findIndex(v=>v.key===x.key);i>=0?list.splice(i,1,x):list.unshift(x);setWrong(list);renderLab()}
+function bestResults(){const out={};for(const x of (window.ATAS_V2_LEARNER?.state?.exams||[])){if(!out[x.category]||x.score>out[x.category].score)out[x.category]=x}return out}
+function ensureUi(){if($('#assessmentV2'))return;const c=$('.content');if(!c)return;const sec=document.createElement('section');sec.id='assessmentV2';sec.className='v2-module';sec.innerHTML=`<div class="module-head"><div><small>LEARNING LAB</small><h2>認證與實戰練習</h2><p>考試、錯題本與實戰判斷集中在同一區。</p></div></div><div class="assessment-grid"><article class="assessment-card"><div class="assessment-icon">🏆</div><h3>認證中心</h3><p>電子、真人、體育三大分類，80 分以上通過。</p><div id="certMini"></div></article><article class="assessment-card"><div class="assessment-icon">🧠</div><h3>錯題本 <span id="wrongCount">0</span></h3><p>做錯的認證題與實戰題會自動收錄。</p><button data-open-wrong>查看錯題本</button></article><article class="assessment-card"><div class="assessment-icon">🎯</div><h3>實戰練習</h3><p>混合遊戲規則、客服情境與盤口判斷。</p><button class="primary" data-open-practice>開始練習</button></article></div>`;c.appendChild(sec);sec.querySelector('[data-open-wrong]').onclick=openWrong;sec.querySelector('[data-open-practice]').onclick=()=>openPractice(0)}
+function ensureModal(){if($('#assessmentModal'))return;const m=document.createElement('div');m.id='assessmentModal';m.className='v2-modal hidden';m.innerHTML=`<div class="v2-dialog"><div class="dialog-head"><div><small>ATAS TRAINING</small><h2 id="assessmentTitle"></h2></div><button data-close-assessment>×</button></div><div id="assessmentBody"></div></div>`;document.body.appendChild(m);m.querySelector('[data-close-assessment]').onclick=()=>m.classList.add('hidden');m.onclick=e=>{if(e.target===m)m.classList.add('hidden')}}
+function renderLab(){ensureUi();const best=bestResults(),cert=$('#certMini');if(cert)cert.innerHTML=Object.keys(EXAMS).map(cat=>{const r=best[cat];return `<button class="cert-mini ${r?.passed?'pass':''}" data-exam="${esc(cat)}"><span>${esc(cat)}</span><b>${r?`${r.score} 分`:'開始考試'}</b></button>`}).join('');$$('[data-exam]',cert).forEach(b=>b.onclick=()=>openExam(b.dataset.exam));const n=$('#wrongCount');if(n)n.textContent=getWrong().length}
+function openExam(cat){ensureModal();$('#assessmentTitle').textContent=`${cat}分類考試`;const body=$('#assessmentBody'),qs=EXAMS[cat];body.innerHTML=qs.map((q,i)=>`<section class="exam-q-v2"><strong>${i+1}. ${esc(q[0])}</strong><div class="exam-options-v2">${q[1].map((o,j)=>`<label><input type="radio" name="exam${i}" value="${j}"> ${esc(o)}</label>`).join('')}</div></section>`).join('')+'<button class="primary-wide" data-submit-exam>提交答案</button>';body.querySelector('[data-submit-exam]').onclick=()=>submitExam(cat);$('#assessmentModal').classList.remove('hidden')}
+async function submitExam(cat){const qs=EXAMS[cat],wrong=getWrong();let answered=0,correct=0;qs.forEach((q,i)=>{const v=$(`input[name="exam${i}"]:checked`);if(!v)return;answered++;const p=Number(v.value);if(p===q[2])correct++;else{const item={key:`exam|${cat}|${q[0]}`,source:`${cat}認證`,q:q[0],answer:q[1][p],correct:q[1][q[2]],explain:'請回到相關教學複習後再挑戰。',time:Date.now()};const idx=wrong.findIndex(x=>x.key===item.key);idx>=0?wrong.splice(idx,1,item):wrong.unshift(item)}});if(answered<qs.length){alert('請先完成全部題目。');return}setWrong(wrong);const score=Math.round(correct/qs.length*100),pass=score>=80;let synced=false;if(window.ATAS_V2_API?.token()){try{await window.ATAS_V2_API.saveExam(cat,score);synced=true;await window.ATAS_V2_LEARNER?.refresh()}catch(e){console.warn(e)}}$('#assessmentBody').innerHTML=`<div class="exam-result-v2 ${pass?'pass':'fail'}"><div>${pass?'🏅':'📘'}</div><h2>${pass?'認證通過':'尚未通過'}</h2><strong>${score} 分</strong><p>${pass?'已達 80 分通過標準。':'建議先複習錯題再重新挑戰。'}</p><small>${synced?'成績已同步至學員帳號':window.ATAS_V2_API?.token()?'同步失敗，請稍後再試':'登入學員帳號後才會同步成績'}</small></div><button class="primary-wide" data-result-close>完成</button>`;$('#assessmentBody [data-result-close]').onclick=()=>$('#assessmentModal').classList.add('hidden');renderLab()}
+function openWrong(){ensureModal();$('#assessmentTitle').textContent='錯題本';const body=$('#assessmentBody'),list=getWrong();body.innerHTML=list.length?`<div class="wrong-list-v2">${list.map((x,i)=>`<article><b>${esc(x.q)}</b><span class="bad">你的答案：${esc(x.answer||'—')}</span><span class="good">正確答案：${esc(x.correct||'—')}</span><small>${esc(x.explain||'')}</small><button data-remove-wrong="${i}">已學會，移除</button></article>`).join('')}</div>`:'<div class="empty">目前沒有錯題。</div>';$$('[data-remove-wrong]',body).forEach(b=>b.onclick=()=>{const a=getWrong();a.splice(Number(b.dataset.removeWrong),1);setWrong(a);openWrong();renderLab()});$('#assessmentModal').classList.remove('hidden')}
+function openPractice(i){ensureModal();const q=PRACTICE[i],body=$('#assessmentBody');$('#assessmentTitle').textContent='實戰練習';body.innerHTML=`<div class="practice-progress-v2">${i+1} / ${PRACTICE.length}</div><section class="practice-q-v2"><small>${esc(q.type)}</small><h3>${esc(q.q)}</h3><div>${q.opts.map((o,j)=>`<button data-practice="${j}">${esc(o)}</button>`).join('')}</div><p class="practice-explain-v2 hidden">${esc(q.ex)}</p><button class="primary-wide hidden" data-practice-next>${i===PRACTICE.length-1?'完成':'下一題 →'}</button></section>`;let done=false;$$('[data-practice]',body).forEach(b=>b.onclick=()=>{if(done)return;done=true;const p=Number(b.dataset.practice);$$('[data-practice]',body).forEach((x,j)=>x.classList.add(j===q.a?'correct':j===p?'wrong':''));$('.practice-explain-v2',body).classList.remove('hidden');$('[data-practice-next]',body).classList.remove('hidden');if(p!==q.a)addWrong({key:`practice|${q.q}`,source:q.type,q:q.q,answer:q.opts[p],correct:q.opts[q.a],explain:q.ex,time:Date.now()})});$('[data-practice-next]',body).onclick=()=>{if(i<PRACTICE.length-1)openPractice(i+1);else{$('#assessmentModal').classList.add('hidden');renderLab()}};$('#assessmentModal').classList.remove('hidden')}
+function boot(){ensureUi();renderLab();window.addEventListener('atas:v2-learner-updated',renderLab)}
+document.readyState==='loading'?document.addEventListener('DOMContentLoaded',boot):boot();
+window.ATAS_V2_ASSESSMENT={render:renderLab};
+})();
