@@ -9,7 +9,8 @@ const files=[
   'seed-sports-guides.json',
   'seed-electronic-advanced.json',
   'seed-live-advanced.json',
-  'seed-sports-advanced.json'
+  'seed-sports-advanced.json',
+  'seed-provider-games-batch1.json'
 ];
 
 fs.mkdirSync(path.dirname(DB_PATH),{recursive:true});
