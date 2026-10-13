@@ -3,7 +3,14 @@ import path from 'path';
 import Database from 'better-sqlite3';
 
 const DB_PATH=process.env.DB_PATH||path.resolve(process.cwd(),'atas-guide.db');
-const files=['seed-electronic-guides.json','seed-live-guides.json','seed-sports-guides.json'];
+const files=[
+  'seed-electronic-guides.json',
+  'seed-live-guides.json',
+  'seed-sports-guides.json',
+  'seed-electronic-advanced.json',
+  'seed-live-advanced.json',
+  'seed-sports-advanced.json'
+];
 
 fs.mkdirSync(path.dirname(DB_PATH),{recursive:true});
 const db=new Database(DB_PATH);
