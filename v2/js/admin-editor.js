@@ -1,7 +1,7 @@
 (()=>{
 'use strict';
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const api=()=>window.ATAS_V2_ADMIN_API;
 let current=null,onSaved=null;
 function slugify(s){return String(s||'').trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9\u4e00-\u9fff_-]/g,'').replace(/-+/g,'-').slice(0,80)}
