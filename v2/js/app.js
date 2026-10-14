@@ -1,7 +1,7 @@
 (()=>{
 'use strict';
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const state={guides:[],category:'全部',q:''};
 function categories(){const preferred=['電子遊戲','真人遊戲','體育','棋牌','彩票','競速','平台操作','充值教學'];const found=[...new Set(state.guides.map(g=>g.category).filter(Boolean))];return ['全部',...preferred.filter(x=>found.includes(x)),...found.filter(x=>!preferred.includes(x)).sort((a,b)=>a.localeCompare(b,'zh-Hant'))]}
 function filtered(){const q=state.q.trim().toLowerCase();return state.guides.filter(g=>(state.category==='全部'||g.category===state.category)&&(!q||`${g.title} ${g.intro} ${g.category} ${g.provider} ${(g.tags||[]).join(' ')}`.toLowerCase().includes(q)))}
