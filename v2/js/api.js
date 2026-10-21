@@ -22,10 +22,11 @@ function normalizeGuide(r){
   return {id:b.id||r.slug,title:b.title||r.title||'未命名教學',category:b.category||r.category||'未分類',provider:b.provider||'',emoji:b.emoji||'📘',intro:b.intro||'',tags:Array.isArray(b.tags)?b.tags:[],cover:b.cover||'',sections:Array.isArray(b.sections)?b.sections:[],steps:Array.isArray(b.steps)?b.steps:[],updatedAt:r.updated_at||r.created_at||''};
 }
 async function loadGuides(){const rows=await request('/public/content');if(!Array.isArray(rows))throw new Error('教學資料格式錯誤');return rows.filter(r=>r.type==='guide').map(normalizeGuide).filter(g=>g.id&&g.title)}
+async function loadQuestions(){const rows=token()?await learnerRequest('/learner/questions'):await request('/practice/questions');if(!Array.isArray(rows))throw new Error('題庫資料格式錯誤');return rows}
 async function learnerLogin(username,password){const r=await request('/learner/login',{method:'POST',body:JSON.stringify({username,password})});setToken(r.token);return r}
 async function learnerMe(){return learnerRequest('/learner/me')}
 async function saveProgress(guide_slug,category,completed=false){return learnerRequest('/learner/progress',{method:'POST',body:JSON.stringify({guide_slug,category,completed})})}
 async function saveExam(category,score){return learnerRequest('/learner/exams',{method:'POST',body:JSON.stringify({category,score})})}
 function learnerLogout(){setToken('')}
-window.ATAS_V2_API={BASE,request,loadGuides,token,setToken,learnerLogin,learnerMe,saveProgress,saveExam,learnerLogout};
+window.ATAS_V2_API={BASE,request,loadGuides,loadQuestions,token,setToken,learnerLogin,learnerMe,saveProgress,saveExam,learnerLogout};
 })();
