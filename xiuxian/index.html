@@ -13,7 +13,7 @@
   <script>
   (async()=>{
     try{
-      const parts=Array.from({length:7},(_,i)=>`data/part${String(i+1).padStart(2,'0')}.txt`);
+      const parts=['data/part01.txt','data/part02.txt','data/part03.txt','data/part04.txt','data/part05.txt','data/part06a.txt','data/part06b.txt','data/part07.txt'];
       const text=(await Promise.all(parts.map(p=>fetch(p,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(p);return r.text()})))).join('').trim();
       const bin=Uint8Array.from(atob(text),c=>c.charCodeAt(0));
       const ds=new DecompressionStream('gzip');
